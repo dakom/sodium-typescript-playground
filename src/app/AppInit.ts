@@ -5,7 +5,7 @@ import {Ref} from "../lib/refs/Ref";
 import {IO} from "../lib/unsafe/IO";
 import {Application} from "../lib/unsafe/Application";
 
-let app:PIXI.Application = Application.Create(1024, 576,0xF0EAD2, "#091D27");
+let app:PIXI.Application = Application.Create(1920, 1080,0xF0EAD2, "#091D27");
 let topMenu:TopMenu = new TopMenu();
 app.stage.addChild(topMenu);
 

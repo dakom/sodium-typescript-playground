@@ -37,7 +37,7 @@ class UIHelpers {
 
         let text: PIXI.Text = new PIXI.Text(config.label, new PIXI.TextStyle({
             fontFamily: 'Arial',
-            fontSize: 14,
+            fontSize: 24,
             fill: '#ffffff',
             wordWrap: false,
             align: 'center'
