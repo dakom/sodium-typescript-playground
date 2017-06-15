@@ -1,6 +1,8 @@
 # Sodium-Typescript Playground
 
-[Live demo here](https://travis-ci.org/dakom/html5-boilerplate)
+[![Build Status](https://travis-ci.org/dakom/sodium-typescript-playground.svg?branch=master)](https://travis-ci.org/dakom/sodium-typescript-playground)
+
+[Live demo here](https://dakom.github.io/sodium-typescript-playground)
 
 This is mostly just a personal repo for trying out some stuff via sodium-typescript. 
 
