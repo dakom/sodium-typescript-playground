@@ -18,11 +18,11 @@ import * as R from 'ramda';
 //ts doesn't seem to support embedded types like go
 //so __internalPointer probably needs to just be copied/pasted
 //all of these should be primitives, e.g. no PIXI.Point()
-interface ISink {
+interface IRef {
     __internalPointer:any; 
 }
 
-interface IDisplayObjectSink {
+interface IDisplayObjectRef {
     __internalPointer:PIXI.DisplayObject;
     x:number;
     y:number;
@@ -31,9 +31,9 @@ interface IDisplayObjectSink {
     rotation:number;
 }
 
-class SinkUtils {
+class Ref {
     public static Update(ptr:any) {
-        if(<IDisplayObjectSink>ptr) {
+        if(<IDisplayObjectRef>ptr) {
             ptr.__internalPointer.x = ptr.x;
             ptr.__internalPointer.y = ptr.y;
             ptr.__internalPointer.scale.x = ptr.scaleX;
@@ -42,7 +42,7 @@ class SinkUtils {
         }
     }
 
-    public static Create_Display(target:PIXI.DisplayObject): IDisplayObjectSink {
+    public static Create_DisplayObject(target:PIXI.DisplayObject): IDisplayObjectRef {
         return {
             __internalPointer: target,
             x: target.x,
@@ -53,6 +53,7 @@ class SinkUtils {
         }    
     }
 }
+
 
 
 let app = new PIXI.Application(window.innerWidth, window.innerHeight);
@@ -73,10 +74,10 @@ ticker.add(gameLoop);
 ticker.start();
 
 
-let ballRef = SinkUtils.Create_Display(ball);
+let ballRef = Ref.Create_DisplayObject(ball);
 
 function gameLoop(deltaTime:number) {
     //makes a new copy
     ballRef = R.assoc('x', ballRef.x + deltaTime * 1, ballRef);
-    SinkUtils.Update(ballRef);
+    Ref.Update(ballRef);
 }
