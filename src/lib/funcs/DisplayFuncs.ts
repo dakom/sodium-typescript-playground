@@ -9,7 +9,7 @@ export class DisplayFuncs {
     public static getLayoutRow(padding:number, refs:Array<IDisplayObjectRef>):Array<IDisplayObjectRef> {
         //todo - change this to compose()
         let widths = PrimitiveFuncs.accProps("width", refs);
-        let positions = PrimitiveFuncs.addMargin(padding, widths);
+        let positions = PrimitiveFuncs.addPadding(padding, widths);
         return R.zipWith((ref, x) => R.assoc('x', x, ref), refs, positions);
     }
 }

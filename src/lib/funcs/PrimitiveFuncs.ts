@@ -1,11 +1,11 @@
 import * as R from "ramda";
 
 export class PrimitiveFuncs {
-    //takes a margin and a list of numbers
-    //adds the margin into them sequentially increasing to give it space
-    public static addMargin(margin:number, vals:Array<number>):Array<number> {
+    //takes a padding and a list of numbers
+    //adds the padding into them sequentially increasing to give it space
+    public static addPadding(pad:number, vals:Array<number>):Array<number> {
         let mapIndexed = R.addIndex(R.map);
-        return mapIndexed((val, idx) => val + (idx * margin), vals);
+        return mapIndexed((val, idx) => val + (idx * pad), vals);
     }
 
     //accumulates the total of property prop in all the vals
