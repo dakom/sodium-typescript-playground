@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import { Ref, IDisplayObjectRef } from "../../lib/refs/Ref";
 import { IO } from "../../lib/unsafe/IO";
-import { HelperFuncs } from "../../lib/funcs/HelperFuncs";
+import { DisplayFuncs } from "../../lib/funcs/DisplayFuncs";
 import { MenuConfig, MenuConfigs } from "./MenuConfig";
 
 
@@ -26,7 +26,7 @@ export class TopMenu extends PIXI.Container {
         let refs = R.map(Ref.Create_DisplayObject, this.buttons);
 
         //in this particular case there isn't much to do!
-        HelperFuncs.getLayoutRow(BUTTON_PADDING_X, refs).forEach(IO.Update);
+        DisplayFuncs.getLayoutRow(BUTTON_PADDING_X, refs).forEach(IO.Update);
     }
 }
 
