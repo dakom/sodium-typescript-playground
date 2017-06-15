@@ -28,7 +28,12 @@ module.exports = (function () {
     loc: the relative location of the target file (no prefixes)
     type: remote or dist
   */
-  var externalLibs = [];
+  var externalLibs = [
+    {
+      loc: 'cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js',
+      type: 'remote'
+    },
+  ];
 
 /*
   The following seting is for where the external libs are imported as modules in code but *only* for IDE helpers. 
