@@ -14,6 +14,47 @@ topMenu.position.set(10, 10);
 import * as R from 'ramda';
 
 
+
+//ts doesn't seem to support embedded types like go
+//so __internalPointer probably needs to just be copied/pasted
+//all of these should be primitives, e.g. no PIXI.Point()
+interface ISink {
+    __internalPointer:any; 
+}
+
+interface IDisplayObjectSink {
+    __internalPointer:PIXI.DisplayObject;
+    x:number;
+    y:number;
+    scaleX:number;
+    scaleY:number;
+    rotation:number;
+}
+
+class SinkUtils {
+    public static Update(ptr:any) {
+        if(<IDisplayObjectSink>ptr) {
+            ptr.__internalPointer.x = ptr.x;
+            ptr.__internalPointer.y = ptr.y;
+            ptr.__internalPointer.scale.x = ptr.scaleX;
+            ptr.__internalPointer.scale.y = ptr.scaleY;
+            ptr.__internalPointer.rotation = ptr.rotation;
+        }
+    }
+
+    public static Create_Display(target:PIXI.DisplayObject): IDisplayObjectSink {
+        return {
+            __internalPointer: target,
+            x: target.x,
+            y: target.y,
+            scaleX: target.scale.x,
+            scaleY: target.scale.y,
+            rotation: target.rotation
+        }    
+    }
+}
+
+
 let app = new PIXI.Application(window.innerWidth, window.innerHeight);
 document.body.appendChild(app.view);
 
@@ -31,19 +72,11 @@ let ticker = new PIXI.ticker.Ticker();
 ticker.add(gameLoop);
 ticker.start();
 
-let ballReference = {
-    ptr: ball,
-    x: 0
-}
 
-function performUnsafeIO(reference) {
-    reference.ptr.x = reference.x;
-}
+let ballRef = SinkUtils.Create_Display(ball);
+
 function gameLoop(deltaTime:number) {
-    //this version breaks!
-    //ball = R.assoc('x', ball.position.x + deltaTime * 1, ball);
-    
-    //This works fine... but are there any gotchas?
-    ballReference = R.assoc('x', ballReference.x + deltaTime * 1, ballReference);
-    performUnsafeIO(ballReference);
+    //makes a new copy
+    ballRef = R.assoc('x', ballRef.x + deltaTime * 1, ballRef);
+    SinkUtils.Update(ballRef);
 }
