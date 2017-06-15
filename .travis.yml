@@ -19,6 +19,9 @@ before_script:
 
 script:
   - npm run test:dist:production
+  
+after_success:
+  - ./deploy-to-gh-pages.sh
 
 #this fails for some reason?!
 #addons:
