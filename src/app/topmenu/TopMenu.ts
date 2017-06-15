@@ -23,6 +23,8 @@ export class TopMenu extends PIXI.Container {
         }
 
         buttons.map(btn => this.addChild(btn));
+
+        
     }
 
     setToPositions(targets:Array<PIXI.DisplayObject>, positions:Array<number>) {
