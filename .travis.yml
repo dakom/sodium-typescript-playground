@@ -21,7 +21,7 @@ script:
   - npm run test:dist:production
   
 after_success:
-  - ./deploy-to-gh-pages.sh
+  - npm run build:dist; ./deploy-to-gh-pages.sh
 
 #this fails for some reason?!
 #addons:
