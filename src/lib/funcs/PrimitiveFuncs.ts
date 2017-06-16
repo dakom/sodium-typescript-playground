@@ -12,4 +12,10 @@ export class PrimitiveFuncs {
     public static accProps(prop:string, vals:Array<any>):Array<number> {
         return R.scan(R.add, 0, R.pluck(prop, vals));
     }
+
+    //sets the prop on the object via lifting
+    //nothing is returned since it would be a 
+    public static setProp(obj:any, key:string, val:any) {
+        R.lift(data => data[key] = val)(R.of(obj));
+    }
 }

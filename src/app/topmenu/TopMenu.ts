@@ -1,6 +1,4 @@
 import * as R from 'ramda';
-import { Ref, IDisplayObjectRef } from "../../lib/refs/Ref";
-import { IO } from "../../lib/unsafe/IO";
 import { DisplayFuncs } from "../../lib/funcs/DisplayFuncs";
 import { MenuConfig, MenuConfigs } from "./MenuConfig";
 
@@ -18,15 +16,14 @@ export class TopMenu extends PIXI.Container {
         this.buttons.forEach((btn) => this.addChild(btn));
     }
     
-    //the render function should work with dynamic updates... follows this idea:
-    //1. gets fp-safe references
-    //2. runs algorithm on them, this is where most of the logic should happen
-    //3. at the end runs fp-unsafe update on the objects (IO.Update)
+    
     public render() {
-        let refs = R.map(Ref.Create_DisplayObject, this.buttons);
+        let buttonCopies = DisplayFuncs.getLayoutRow(BUTTON_PADDING_X, this.buttons);
+        function setProp(obj, key, val) {
+        R.lift(data => data[key] = val)(R.of(obj));
+    }
 
-        //in this particular case there isn't much to do!
-        DisplayFuncs.getLayoutRow(BUTTON_PADDING_X, refs).forEach(IO.Update);
+        R.zipWith((copy, target) => {target.x = copy.x; return copy}, buttonCopies, this.buttons);
     }
 }
 
