@@ -1,6 +1,6 @@
-import * as R from 'ramda';
+/*import * as R from 'ramda';
 import { DisplayFuncs } from "../../lib/funcs/DisplayFuncs";
-import { MenuConfig, MenuConfigs } from "./MenuConfig";
+import { MenuConfig } from "./MenuConfig";
 
 
 const BUTTON_MARGIN = 10;
@@ -53,3 +53,4 @@ class UIHelpers {
         return container;
     }
 }
+*/

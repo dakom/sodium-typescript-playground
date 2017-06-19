@@ -1,10 +1,14 @@
+import { List } from "immutable";
+
 export class MenuConfig {
-    constructor(public label:string) {}
+    constructor(public readonly label: string) { }
 }
 
-export const MenuConfigs:Array<MenuConfig> = [
-    new MenuConfig("bunnies - baseline"),
-    new MenuConfig("bunnies - frp"),
-    new MenuConfig("draw"),
-    new MenuConfig("pong")
-]
+export function GetMenuConfig(): List<MenuConfig> {
+    return List<MenuConfig>([
+        new MenuConfig("bunnies - baseline"),
+        new MenuConfig("bunnies - frp"),
+        new MenuConfig("draw"),
+        new MenuConfig("pong")
+    ]);
+}
