@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import { PrimitiveFuncs } from "../../lib/funcs/PrimitiveFuncs";
 
-import { Stream, StreamSink} from "sodiumjs";
+import {Cell, Stream, StreamSink} from "sodiumjs";
 
 const BUTTON_MARGIN = 10;
 const BUTTON_PADDING_X = 10;
@@ -16,10 +16,13 @@ class MenuConfig {
 
 export class TopMenu extends PIXI.Container {
     private _sClicked:StreamSink<string>;
+    public id:Cell<string>;
 
     constructor(stage: PIXI.Container) {
         super();
         this._sClicked = new StreamSink<string>();
+
+        this.id = this._sClicked.hold("simple");
 
         stage.addChild(this);
         this.render();        
@@ -40,6 +43,7 @@ export class TopMenu extends PIXI.Container {
         ].map(config => {
             let btn = UIHelpers.createButton(config);
             btn.on('pointerdown', evt => {
+                console.log(config.id);
                 this._sClicked.send(config.id);
             })
             this.addChild(btn);
