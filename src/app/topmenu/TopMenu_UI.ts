@@ -4,7 +4,7 @@ import { PrimitiveFuncs } from "../../lib/funcs/PrimitiveFuncs";
 import { MenuConfig, Configs } from "./TopMenu_Config";
 import * as R from 'ramda';
 
-export class MenuButton extends PIXI.Container {
+class MenuButton extends PIXI.Container {
 
     constructor(private config: MenuConfig, selected: boolean) {
         super();
@@ -37,21 +37,24 @@ export class MenuButton extends PIXI.Container {
         this.addChild(graphics);
         this.interactive = this.buttonMode = true;
 
-    
+
     }
 
-    public get id():string {
+    public get id(): string {
         return this.config.id;
     }
 }
 
-export function createButtons(selectedId): Array<MenuButton> {
-    let buttons = Configs.map(config => new MenuButton(config, config.id === selectedId ? true : false));
+export class UI {
+    public static CreateButtons(selectedId): Array<MenuButton> {
+        let buttons = Configs.map(config => new MenuButton(config, config.id === selectedId ? true : false));
 
-    let positions = PrimitiveFuncs.addPadding(  BUTTON_PADDING_X, 
-                                                PrimitiveFuncs.accProps("width", buttons));
+        let positions = PrimitiveFuncs.addPadding(BUTTON_PADDING_X,
+            PrimitiveFuncs.accProps("width", buttons));
 
-    R.zipWith((ref, x) => ref.x = x, buttons, positions);
+        R.zipWith((ref, x) => ref.x = x, buttons, positions);
 
-    return buttons;
+        return buttons;
+    }
 }
+

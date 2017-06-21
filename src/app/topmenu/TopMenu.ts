@@ -2,7 +2,7 @@ import * as R from 'ramda';
 import { PrimitiveFuncs } from "../../lib/funcs/PrimitiveFuncs";
 import { SimpleMove } from "../modules/simplemove/SimpleMove";
 import {Cell, CellSink} from "sodiumjs";
-import {createButtons} from "./TopMenu_UI";
+import {UI} from "./TopMenu_UI";
 
 export class TopMenu extends PIXI.Container {
     private _onSelected:CellSink<string>;
@@ -26,10 +26,10 @@ export class TopMenu extends PIXI.Container {
         return this._onSelected;
     }
 
-    render(id:string) {
+    render(selectedId:string) {
         this.removeChildren();
 
-        createButtons(id)
+        UI.CreateButtons(selectedId)
             .forEach(btn => {
                 this.addChild(btn);
                 btn.on('pointerdown', evt => {
@@ -37,5 +37,6 @@ export class TopMenu extends PIXI.Container {
                 })
             });
     }
+    
 }
 
