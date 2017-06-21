@@ -1,6 +1,6 @@
 import { Stream, StreamSink } from "sodiumjs";
 
-export class TimerStream {
+export class Ticker {
     private readonly sink: StreamSink<number>;
     private readonly ticker: PIXI.ticker.Ticker;
 

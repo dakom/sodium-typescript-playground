@@ -1,85 +1,41 @@
 import * as R from 'ramda';
 import { PrimitiveFuncs } from "../../lib/funcs/PrimitiveFuncs";
-
-import {Cell, Stream, StreamSink} from "sodiumjs";
-
-const BUTTON_MARGIN = 10;
-const BUTTON_PADDING_X = 10;
-
-class MenuConfig {
-    constructor(public readonly id:string, public readonly label?: string) { 
-        if(label === undefined) {
-            this.label = id;
-        }
-    }
-}
+import { SimpleMove } from "../modules/simplemove/SimpleMove";
+import {Cell, CellSink} from "sodiumjs";
+import {createButtons} from "./TopMenu_UI";
 
 export class TopMenu extends PIXI.Container {
-    private _sClicked:StreamSink<string>;
-    public id:Cell<string>;
-
-    constructor(stage: PIXI.Container) {
+    private _onSelected:CellSink<string>;
+    
+    constructor(stage: PIXI.Container, initialId:string) {
         super();
-        this._sClicked = new StreamSink<string>();
-
-        this.id = this._sClicked.hold("simple");
-
+        
         stage.addChild(this);
-        this.render();        
+
+        this._onSelected = new CellSink<string>(initialId);
+        this._onSelected.listen(id => this.render(id));
+        this.x = 10;
+        this.y = 10;
     }
 
-    public get sClicked():Stream<string> {
-        return this._sClicked;
+    public changeId(_id:string) {
+        this._onSelected.send(_id);
     }
 
-    public render() {
+    public get onSelected():Cell<string> {
+        return this._onSelected;
+    }
+
+    render(id:string) {
         this.removeChildren();
 
-        let buttons:Array<PIXI.Container> = [
-            new MenuConfig("simple"),
-            new MenuConfig("bunnies"),
-            new MenuConfig("draw"),
-            new MenuConfig("pong")
-        ].map(config => {
-            let btn = UIHelpers.createButton(config);
-            btn.on('pointerdown', evt => {
-                console.log(config.id);
-                this._sClicked.send(config.id);
-            })
-            this.addChild(btn);
-            return btn;
-        })
-
-        let widths = PrimitiveFuncs.accProps("width", buttons);
-        let positions = PrimitiveFuncs.addPadding(BUTTON_PADDING_X, widths);
-        R.zipWith((ref, x) => ref.x = x, buttons, positions);
-
+        createButtons(id)
+            .forEach(btn => {
+                this.addChild(btn);
+                btn.on('pointerdown', evt => {
+                    this._onSelected.send(btn.id);
+                })
+            });
     }
 }
 
-class UIHelpers {
-    public static createButton(config: MenuConfig): PIXI.Container {
-        let container = new PIXI.Container();
-        let graphics = new PIXI.Graphics();
-        
-        let text: PIXI.Text = new PIXI.Text(config.label, new PIXI.TextStyle({
-            fontFamily: 'Arial',
-            fontSize: 24,
-            fill: '#ffffff',
-            wordWrap: false,
-            align: 'center'
-        }));
-        graphics.beginFill(0x595234);
-        graphics.drawRoundedRect(0, 0, text.width + (BUTTON_MARGIN * 2), text.height + (BUTTON_MARGIN * 2), 10);
-        graphics.endFill();
-
-        graphics.addChild(text);
-
-        text.x = BUTTON_MARGIN;
-        text.y = BUTTON_MARGIN;
-        container.addChild(graphics);
-        container.interactive = container.buttonMode = true;
-
-        return container;
-    }
-}
