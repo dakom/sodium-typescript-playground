@@ -11,7 +11,7 @@ let topMenu = new TopMenu(stage, "simple");
 let currentModule: PIXI.Container;
 
 //Module changing handler
-function changeModule(id) {
+topMenu.onSelected.listen(id => {
     if (currentModule !== undefined) {
         stage.removeChild(currentModule);
         currentModule = undefined;
@@ -25,7 +25,6 @@ function changeModule(id) {
     if (currentModule !== undefined) {
         stage.addChild(currentModule);
     }
-}
+});
 
-//Basically, main
-topMenu.onSelected.listen(changeModule);
+
