@@ -1,7 +1,7 @@
 import {Main} from "./Main";
 import {TopMenu} from "./topmenu/TopMenu";
 import {SimpleMove} from "./modules/simplemove/SimpleMove";
-import {Cell, CellLoop, Transaction, StreamSink} from "sodiumjs"
+import {Cell, CellLoop, CellSink, Transaction, StreamSink, lambda1} from "sodiumjs"
 Main.Init();
 
 
@@ -9,9 +9,11 @@ Transaction.run((): void => {
     let stream = new StreamSink<number>();
     let cell = stream.hold(0);
 
-    stream.snapshot(cell, (a, b) => b)
-        .listen(console.log);
-    
+    stream.listen(n => {
+        lambda1((a:Cell<number>) => console.log(a.sample()), [cell]);
+    });
+        
+
     setInterval(() => stream.send(Date.now()), 1000);
 });
 
