@@ -12,6 +12,7 @@ let currentModule: PIXI.Container;
 
 //Module changing handler
 
+/*
 topMenu.onSelected.listen(id => {
     if (currentModule !== undefined) {
         stage.removeChild(currentModule);
@@ -27,19 +28,19 @@ topMenu.onSelected.listen(id => {
         stage.addChild(currentModule);
     }
 });
+*/
 
 
-/*
 Transaction.run((): void => {
     let counter = new StreamSink<number>();
-    let holder = counter.hold(Date.now());
-    let listener:any = holder.listen(console.log);
+    counter.listen(() => {});
     
-    //how to destroy holder?
-    //this says unlisten is not a function
-    listener.unlisten();
+    let holder = counter.hold(Date.now());
+    let unlisten:() => void = holder.listen(console.log);
+    
     
     setInterval(() => counter.send(Date.now()), 300);
+
+    setTimeout(unlisten, 3000);
 });
-*/
 
