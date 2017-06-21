@@ -1,9 +1,24 @@
 import {Main} from "./Main";
 import {TopMenu} from "./topmenu/TopMenu";
 import {SimpleMove} from "./modules/simplemove/SimpleMove";
-import {Cell, CellLoop, CellSink, Transaction, StreamSink, lambda1} from "sodiumjs"
+import {Cell, CellLoop, CellSink, Transaction, StreamSink, Stream, lambda1} from "sodiumjs"
 Main.Init();
 
+interface IScene {
+    start():void;
+    cleanup():void;
+}
+
+class IntroScene implements IScene {
+    public start() {
+        //load assets
+        //begin gameplay
+    }
+
+    public cleanup() {
+        //free texture memory
+    }
+}
 
 Transaction.run((): void => {
     let stream = new StreamSink<number>();
