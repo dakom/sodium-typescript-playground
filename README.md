@@ -24,6 +24,8 @@ However, sodium/frp could still be used to handle the main logic perfectly and t
 
 Overall it's a win - the lesson learned is more about how to use each tool for the job rather than abandoning one for the other.
 
+More related info and discoveries are in the "Architecture" section of the [Learning notes](Notes.md)
+
 ----
 
 # TODO
