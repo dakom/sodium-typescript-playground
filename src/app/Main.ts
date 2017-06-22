@@ -15,6 +15,7 @@ export class Main {
         this.ScaleToWindow(this.app.view, pageBackgroundColor);
     }
 
+    //adapted from https://github.com/kittykatattack/scaleToWindow
     static ScaleToWindow(canvas: HTMLElement, backgroundColor: string) {
         var scaleX, scaleY, scale, center;
 

@@ -9,6 +9,7 @@ export class MenuConfig {
 export const Configs = [
             new MenuConfig("simple"),
             new MenuConfig("bunnies"),
+            new MenuConfig("switch"),
             new MenuConfig("draw"),
             new MenuConfig("select")
 ];

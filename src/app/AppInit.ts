@@ -2,20 +2,21 @@ import { Main } from "./Main";
 import { TopMenu } from "./topmenu/TopMenu";
 import { SimpleMove } from "./modules/simplemove/SimpleMove";
 import { CellLoop, StreamSink, Cell, Transaction } from "sodiumjs"
-
+import { IDisposable } from "./interfaces/IDisposable";
 //Core IO
 Main.Init();
 
 let stage = Main.app.stage;
-let topMenu = new TopMenu(stage, "simple");
-let currentModule: PIXI.Container;
+let topMenu = new TopMenu(stage, undefined);
+//let topMenu = new TopMenu(stage, "simple");
+let currentModule: PIXI.DisplayObject | IDisposable;
 
 //Module changing handler
-
-/*
 topMenu.onSelected.listen(id => {
     if (currentModule !== undefined) {
-        stage.removeChild(currentModule);
+        stage.removeChild(currentModule as PIXI.DisplayObject);
+        (currentModule as IDisposable).dispose();
+
         currentModule = undefined;
     }
 
@@ -25,22 +26,6 @@ topMenu.onSelected.listen(id => {
     }
 
     if (currentModule !== undefined) {
-        stage.addChild(currentModule);
+        stage.addChild(currentModule as PIXI.DisplayObject);
     }
 });
-*/
-
-
-Transaction.run((): void => {
-    let counter = new StreamSink<number>();
-    counter.listen(() => {});
-    
-    let holder = counter.hold(Date.now());
-    let unlisten:() => void = holder.listen(console.log);
-    
-    
-    setInterval(() => counter.send(Date.now()), 300);
-
-    setTimeout(unlisten, 3000);
-});
-

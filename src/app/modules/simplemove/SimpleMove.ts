@@ -2,24 +2,22 @@
 import { Ticker } from "../../../lib/time/Ticker";
 import { Transaction, CellLoop } from "sodiumjs";
 import { Ball } from "./SimpleMove_Ball";
+import { IDisposable } from "../../interfaces/IDisposable";
 
-export class SimpleMove extends PIXI.Container {
+export class SimpleMove extends PIXI.Container implements IDisposable {
     private ball:Ball;
+    private ticker:Ticker;
 
     constructor() {
         super();
-        this.once('removed', () => this.cleanup());
 
-        //IO is basically in setup and listen()        
-        let sTicks = new Ticker().sTicks;
-        this.ball = new Ball(sTicks);
+        this.ticker = new Ticker();
+        this.ball = new Ball(this.ticker.sTicks);
         this.addChild(this.ball);
-
-
     }
 
-    cleanup() {
-        
-        console.log("cleaning up simple ball move...");
+    public dispose() {
+        this.ticker.dispose();
+        this.ball.dispose();
     }
 }

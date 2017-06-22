@@ -8,6 +8,8 @@ This is mostly just a personal repo for trying out some stuff via sodium-typescr
 
 There may be purposefully broken code to highlight questions, for example.
 
+Some rough notes on what I'm learning can be found [here](Notes.md)
+
 ----
 
 (note, the boilerplate webpack, typescript, etc. code is cloned from [here](https://github.com/dakom/html5-boilerplate/tree/barebones))
