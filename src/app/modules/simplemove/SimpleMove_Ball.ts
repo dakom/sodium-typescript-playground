@@ -28,10 +28,7 @@ export class Ball extends BaseContainer {
                 x: 0,
                 v: SPEED
             }));
-            this.unlistener = cMotion.listen(motion => {
-                //console.log(x);
-                this.x = motion.x;
-            });
+            this.unlistener = cMotion.listen(motion => this.x = motion.x);
         });
     }
 

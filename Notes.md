@@ -2,7 +2,7 @@
 
 ## Listen is the end - and it's really for side-effects
 
-This is a major paradigm shift compared to how `listen()` plays a role in typical event-driven architectures.
+This is a major paradigm shift compared to how `listen()` plays a role in typical oop event-driven architectures.
 
 In frp, listen() is _not_ where you start the processing - it's where you listen to the final result of the processing, and then do something with the results (e.g. cause side-effects).
 
@@ -35,7 +35,7 @@ Changing things is inherent in frp itself. i.e. a changing menu screen might be 
 
 It's tempting to think of making the menu object itself into some kind of cell or stream so that it can be changed via switch(), but this is needless complication.
 
-Use switch where you need changes of changes
+Use switch where you need changes of changes. That's inherently complicated and the use-case switch is designed for.
 
 # Cells
 
@@ -102,29 +102,49 @@ Transaction.run((): void => {
 
 We want everything to fit neatly into a clear framework where IO is dealt with in one place and everything else in another - but my numerous attempts to abstract this failed to provide the benefits one might imagine.
 
-For a specific example, I thought maybe there should be an immutable Transform class that can be derived from a PIXI DisplayObject, and contain a pointer to that object (or reference to an id which can be looked up in a hash table), and then the Transform goes through the fp/frp pipeline until its done and then gets applied - all through common utilities and clear boundry lines.
+This basically broke down in a few areas:
+1. Trying to fit everything into frp
+2. Trying to abstract everything into reusable components
+3. Trying to mix frp with other patterns that didn't mesh well
+4. Unnecessary fear of mixing fp/frp with other approaches that _do_ fit well.
+5. Wanting to use non-frp third-party frameworks (PIXI)
 
-In practice, this basically _is_ a good approach - but not as a generic abstracted set of utilities. Rather, it typically makes more sense to treat this more as an _architectural approach_ than a specific set of classes. The idea of getting an immutable object, manipulating that, and then applying it at the end is good - but the application is typically better handled via custom code that follows certain patterns rather than abstract base classes and such.
+To give an example that seemed good at first and then broke down: I thought maybe there should be an immutable Transform class that can be derived from a PIXI DisplayObject, and contain a pointer to that object (or reference to an id which can be looked up in a hash table), and then the Transform goes through the fp/frp pipeline until it's done and then gets applied - all through common utilities and clear boundry lines.
 
-Yet, this also begs the question of how to manage containers - which are mutable, and how to tie them together in a way that makes sense. So far, it seems that the following pattern works quite well
+Sounds good, right?
+
+This worked beautifully at first, and then had numerous issues when things started expanding. It was cleaner to just use local typed objects to describe the particular types of transforms or motions needed for the local logic since there was no real global overlap. Abstracting did not help in any way. Maintaining a hash table might be useful in some scenarios - but not as a global way of applying things.
+
+What _did_ help was using interfaces and classes as containers, and being able to selectively choose non-frp constructs where needed - and even _gasp_ mutable variables where it made sense. That should be taken with a grain of salt though. I found that keeping things neat took an extra step of thinking where to place those - and it was usually about keeping them right at initial setup or the end of a listen. That extra effort really paid off to let frp shine as a great way to drive the core logic.
+
+In practice, I think this basically _is_ a good approach - but not as a generic abstracted set of utilities. Rather, it typically makes more sense to treat this more as an _architectural approach_ than a specific set of classes. I wouldn't even call it a pattern, it's more like a headspace.
+
+Still, there are patterns that seem to sortof emerge from this, so...
 
 ## A reusable pattern
 
-The pattern I'm landing on so far is basically like this, where these classes are mutable containers and not referentially transparent (other types of classes can be used in the frp logic part, of course, and they are analogous to "immutable data from anything"):
+I'm landing on so far on something basically like this:
 
 ```
-class (with _simple_ inheritence - e.g. a base class that automatically calls dispose() when necessary) 
+
+interfaces (to pass around data as js objects - which should be frozen)
+
+export class (with _simple_ inheritence - e.g. a base class that automatically calls dispose() when necessary- and that's it!) 
     constructor()
-        setup ui
-        start transaction
+        setup i/o
+        setup required data structs (all const)
+        assign the data that will need to be disposed later as private vars
+        start transaction(s)
             create immutable data from anything
             pipe it through frp logic (send, snapshot, map, etc.)
             this.unlisten = listen()
-                side effects, create new classes, add them as children, etc.
+                side effects
+                create new classes, add them as children, etc.
     dispose()
         children.dispose()
-        stop this.*.send() triggers
-        this.unlisten()
+        stop send triggers
+        cleanup private data
+        this.unlistens()
 ```
 
 Since this is still early on and I haven't built a large-scale application with this approach yet, it might need adaptation- but it's working so far :D

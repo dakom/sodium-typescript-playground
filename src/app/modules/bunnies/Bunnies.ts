@@ -1,7 +1,6 @@
-
 import { Ticker } from "../../../lib/time/Ticker";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
-import { Transaction, CellLoop, StreamSink, CellSink } from "sodiumjs";
+import { Transaction, CellLoop, StreamSink, CellSink} from "sodiumjs";
 import { BaseContainer } from "../BaseContainer";
 import { Path } from "../../../lib/path/Path";
 import { Bunny } from "./Bunny";
@@ -12,12 +11,13 @@ enum TOUCH {
     DOWN,
     UP
 }
+
 export class Bunnies extends BaseContainer {
     private ticker: Ticker;
     private ui: UI;
     private unlisteners: Array<() => void>;
 
-
+    
     constructor() {
         super();
 
@@ -37,45 +37,46 @@ export class Bunnies extends BaseContainer {
         const unlisteners = new Array<() => void>();
         const bunnies = new Array<Bunny>();
 
-        //stuff that will need to be disposed
+        //disposable stuff
         this.unlisteners = unlisteners;
         this.ticker = ticker;
         this.ui = ui;
 
         //logic
-        const cTouch = new CellSink<TOUCH>(TOUCH.UP);
-        const cLoad = ui.load();
+        const cTouch = new CellSink<TOUCH>(TOUCH.UP); //
+        const cLoad = ui.load(); //load ui assets
 
         const sReady = ticker.sTicks.gate(cLoad); //prevent anything from happening until ui is loaded
         const sCreating = sReady.gate(cTouch.map(t => t == TOUCH.DOWN ? true : false)); //don't make bunnies unless mouse is down
 
-        //render changes
-        /*
+        //render changes when ui is ready
         unlisteners.push(
-            sReady.listen(deltaTime => 
-                bunnies.forEach(bunny => bunny.update(deltaTime)))
+            sReady.listen(() => 
+                bunnies.forEach(b => { 
+                    b.motion = UpdateMotion(b.motion, bounds);
+                    b.render(b.motion);
+                }))
         );
-        */
-
-
+        
+        //Create bunnies while mouse is down
         unlisteners.push(
-            //Create bunny when mouse is down
             sCreating.listen(() => {
                 for (let i = 0; i < 100; i++) {
-                    let bunnyCell = new CellLoop<Motion>();
-                    let bunnyUpdate = ticker.sTicks.snapshot(bunnyCell, (dt, motion) => UpdateMotion(motion, bounds));
-                    bunnyCell.loop(bunnyUpdate.hold(NewMotion()));
-                    let bunny = new Bunny(this.ui.texture, bunnyCell);
-                    bunnies.push(bunny);
-                    this.addChild(bunny);
+                    bunnies.push(this.makeBunny());
                 }
-
-
+               
                 ui.updateStatus(bunnies.length + " bunnies!");
             })
         );
     }
 
+    makeBunny():Bunny {
+        let bunny = new Bunny(this.ui.texture);
+        this.addChild(bunny);
+        return bunny;
+    }
+
+    //called automatically when the container is removed from stage
     dispose() {
         Main.app.renderer.plugins.interaction.off('pointerdown');
         Main.app.renderer.plugins.interaction.off('pointerup');

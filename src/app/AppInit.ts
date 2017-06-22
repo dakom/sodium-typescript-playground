@@ -1,6 +1,8 @@
 import { Main } from "./main/Main";
 import { TopMenu } from "./topmenu/TopMenu";
 import { SimpleMove } from "./modules/simplemove/SimpleMove";
+import { Switch } from "./modules/switch/Switch";
+
 import { Bunnies } from "./modules/bunnies/Bunnies";
 import { CellLoop, StreamSink, Cell, Transaction } from "sodiumjs"
 import { BaseContainer } from "./modules/BaseContainer";
@@ -11,7 +13,7 @@ Main.Init();
 
 let stage = Main.app.stage;
 //let topMenu = new TopMenu(stage, undefined);
-let topMenu = new TopMenu(stage, "simple");
+let topMenu = new TopMenu(stage, "switch");
 let currentModule: BaseContainer;
 let fps:FPS = new FPS;
 
@@ -24,8 +26,10 @@ topMenu.onSelected.listen(id => {
 
     switch (id) {
         case "simple": currentModule = new SimpleMove();
-        break;
+            break;
         case "bunnies": currentModule = new Bunnies();
+            break;
+            case "switch": currentModule = new Switch();
             break;
     }
 

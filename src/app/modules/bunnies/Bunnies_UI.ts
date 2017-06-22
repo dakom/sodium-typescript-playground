@@ -18,7 +18,6 @@ export class UI {
 
         loader.add("bunny", Path.GetImagePath("bunny.png"));
         loader.once("complete", () => {
-            console.log("loaded");
             cLoad.send(true);
         })
         loader.load();

@@ -1,18 +1,21 @@
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Stream, Transaction, CellLoop, Cell } from "sodiumjs";
-import { Motion} from "./Bunny_Motion";
+import { UpdateMotion, Motion, NewMotion } from "./Bunny_Motion";
 import { BaseContainer } from "../BaseContainer"
 import * as R from "ramda";
 
 export class Bunny extends PIXI.Sprite {
-    constructor(texture: PIXI.Texture, cMotion:Cell<Motion>) {
+    public motion:Motion;
+
+    constructor(texture: PIXI.Texture) {
         super(texture)
         this.anchor.x = 0.5;
         this.anchor.y = 1;
+        this.motion = NewMotion();
+    }
 
-        cMotion.listen(motion => {
-            this.x = motion.origin.x;
-            this.y = motion.origin.y;
-        });
+    public render(motion:Motion) {
+        this.x = this.motion.origin.x;
+        this.y = this.motion.origin.y;
     }
 }
