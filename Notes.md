@@ -123,7 +123,7 @@ Still, there are patterns that seem to sortof emerge from this, so...
 
 ## A reusable pattern
 
-I'm landing on so far on something basically like this:
+I'm landing on so far on something basically like this pseudocode:
 
 ```
 
@@ -134,10 +134,10 @@ export class (with _simple_ inheritence - e.g. a base class that automatically c
         setup i/o
         setup required data structs (all const)
         assign the data that will need to be disposed later as private vars
-        start transaction(s)
+        start transactions
             create immutable data from anything
             pipe it through frp logic (send, snapshot, map, etc.)
-            this.unlisten = listen()
+            this.unlistens = listen()
                 side effects
                 create new classes, add them as children, etc.
     dispose()
