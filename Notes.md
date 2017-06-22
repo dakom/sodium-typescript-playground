@@ -46,7 +46,7 @@ There are two ways to do this:
 1. Define the cell as a hold() of the stream
 2. Snapshot the cell when the stream triggers - and update the value via snapshot() itself
 
-There is a potential gotcha here where one might think that snapshot() will update the cell automatically.
+There is a potential gotcha here where one might think that snapshot1(), instead of snapshot(), will update the cell automatically.
 
 Consider this example:
 
