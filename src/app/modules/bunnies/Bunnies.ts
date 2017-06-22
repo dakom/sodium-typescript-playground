@@ -20,37 +20,49 @@ export class Bunnies extends BaseContainer {
     constructor() {
         super();
 
-        this.unlisteners = new Array<() => void>();
+        //input
+        Main.app.renderer.plugins.interaction.on('pointerdown', () => cTouch.send(TOUCH.DOWN));
+        Main.app.renderer.plugins.interaction.on('pointerup', () => cTouch.send(TOUCH.UP));
 
-        const bunnies = new Array<Bunny>();
-        const ui = new Bunnies_UI();
+        //output
         const bounds = new PIXI.Rectangle(0,0,CanvasWidth, CanvasHeight);
+        const ui = new Bunnies_UI();
+        this.addChild(ui.status);
+
+        //time
         const ticker = new Ticker();
+
+        //local containers
+        const unlisteners = new Array<() => void>();
+        const bunnies = new Array<Bunny>();
+        
+        //stuff that will need to be disposed
+        this.unlisteners = unlisteners;
+        this.ticker = ticker;
+        this.ui = ui;
+
+        //logic
         const cTouch = new CellSink<TOUCH>(TOUCH.UP);
         const cLoad =  ui.load();
 
         const sReady = ticker.sTicks.gate(cLoad); //prevent anything from happening until ui is loaded
         const sCreating = sReady.gate(cTouch.map(t => t == TOUCH.DOWN ? true : false)); //don't make bunnies unless mouse is down
 
-        this.unlisteners.push(
+        //render changes
+        unlisteners.push(
             sReady.listen(deltaTime => 
                 bunnies.forEach(bunny => bunny.update(deltaTime)))
         );
 
-        this.unlisteners.push(
+        unlisteners.push(
             sCreating.listen(() => {
                 let bunny = new Bunny(this.ui.texture, bounds);
                 bunnies.push(bunny);
                 this.addChild(bunny);
+
+                ui.updateStatus(bunnies.length + " bunnies!");
             })
         );
-        
-        Main.app.renderer.plugins.interaction.on('pointerdown', () => cTouch.send(TOUCH.DOWN));
-        Main.app.renderer.plugins.interaction.on('pointerup', () => cTouch.send(TOUCH.UP));
-
-        //more stuff that will need to be disposed
-        this.ticker = ticker;
-        this.ui = ui;
     }
 
     dispose() {
