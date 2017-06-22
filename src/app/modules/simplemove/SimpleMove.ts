@@ -2,9 +2,9 @@
 import { Ticker } from "../../../lib/time/Ticker";
 import { Transaction, CellLoop } from "sodiumjs";
 import { Ball } from "./SimpleMove_Ball";
-import { IDisposable } from "../../interfaces/IDisposable";
+import { BaseContainer } from "../BaseContainer";
 
-export class SimpleMove extends PIXI.Container implements IDisposable {
+export class SimpleMove extends BaseContainer {
     private ball:Ball;
     private ticker:Ticker;
 
@@ -16,8 +16,11 @@ export class SimpleMove extends PIXI.Container implements IDisposable {
         this.addChild(this.ball);
     }
 
-    public dispose() {
+    dispose() {
         this.ticker.dispose();
-        this.ball.dispose();
+
+        //removing the ball will cause it to dispose itself
+        //in pixi, there's no "removed from scene" in v4 - coming in v5!
+        this.removeChild(this.ball); 
     }
 }

@@ -1,13 +1,13 @@
 import {UI_Ball} from "./SimpleMove_UI";
-import {CanvasWidth, CanvasHeight } from "../../Main";
+import {CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Stream, Transaction, CellLoop} from "sodiumjs";
-import { IDisposable } from "../../interfaces/IDisposable";
+import {BaseContainer} from "../BaseContainer"
 import * as R from "ramda";
 
 const SPEED = 10;
 const RADIUS = 50;
 
-export class Ball extends PIXI.Container implements IDisposable {
+export class Ball extends BaseContainer {
     private vx:number = SPEED;
     private unlistener:() => void;
 
@@ -25,8 +25,6 @@ export class Ball extends PIXI.Container implements IDisposable {
                 this.x = x;
             });
         });
-
-
     }
 
     getPosition(dt:number, posX:number):number {
@@ -38,11 +36,11 @@ export class Ball extends PIXI.Container implements IDisposable {
         if(posX == xMin || posX == xMax) {
             this.vx *= -1;
         }
-        
+
         return posX;
     }
 
-    public dispose() {
+    dispose() {
        this.unlistener();
     }
 }

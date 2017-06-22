@@ -65,12 +65,12 @@ Transaction.run((): void => {
 });
 ```
 
-This fails because sUpdate is not actually being updated anywhere.
+This fails because sUpdate is not actually having its values changed anywhere.
 
 Either of these approaches could work instead:
 
 ```
-//Success - outputs updates (cell is updated via snapshot stream)
+//Success - outputs updates
 Transaction.run((): void => {
     let stream = new StreamSink<number>();
     let cell = new CellLoop<number>();
@@ -85,7 +85,7 @@ Transaction.run((): void => {
 ```
 
 ```
-//Success - outputs updates (cell is updated inherently via hold)
+//Success - outputs updates
 Transaction.run((): void => {
     let stream = new StreamSink<number>();
     let cell = stream.hold(0);
@@ -98,7 +98,7 @@ Transaction.run((): void => {
 
 # Architecture
 
-## Automatic IO and side effects
+## IO and side effects
 
 We want everything to fit neatly into a clear framework where IO is dealt with in one place and everything else in another - but my numerous attempts to abstract this failed to provide the benefits one might imagine.
 
@@ -106,20 +106,25 @@ For a specific example, I thought maybe there should be an immutable Transform c
 
 In practice, this basically _is_ a good approach - but not as a generic abstracted set of utilities. Rather, it typically makes more sense to treat this more as an _architectural approach_ than a specific set of classes. The idea of getting an immutable object, manipulating that, and then applying it at the end is good - but the application is typically better handled via custom code that follows certain patterns rather than abstract base classes and such.
 
+Yet, this also begs the question of how to manage containers - which are mutable, and how to tie them together in a way that makes sense. So far, it seems that the following pattern works quite well
+
+## A reusable pattern
+
 The pattern I'm landing on so far is basically like this, where these classes are mutable containers and not referentially transparent (other types of classes can be used in the frp logic part, of course, and they are analogous to "immutable data from anything"):
 
 ```
-constructor()
-    setup ui
-    start transaction
-        create immutable data from anything
-        pipe it through frp logic (send, snapshot, map, etc.)
-        this.unlisten = listen()
+class (with _simple_ inheritence - e.g. a base class that automatically calls dispose() when necessary) 
+    constructor()
+        setup ui
+        start transaction
+            create immutable data from anything
+            pipe it through frp logic (send, snapshot, map, etc.)
+            this.unlisten = listen()
                 side effects, create new classes, add them as children, etc.
-dispose()
-    children.dispose()
-    stop this.*.send() triggers
-    this.unlisten()
+    dispose()
+        children.dispose()
+        stop this.*.send() triggers
+        this.unlisten()
 ```
 
 Since this is still early on and I haven't built a large-scale application with this approach yet, it might need adaptation- but it's working so far :D

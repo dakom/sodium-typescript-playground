@@ -52,6 +52,7 @@
     "npm-run-all": "^4.0.2",
     "ramda": "0.24.1",
     "rimraf": "2.6.1",
+    "sanctuary": "0.13.2",
     "sodiumjs": "0.9.1",
     "source-map-loader": "^0.2.1",
     "ts-loader": "^2.0.3",
