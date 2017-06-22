@@ -1,21 +1,22 @@
 
 import { Ticker } from "../../../lib/time/Ticker";
-import {Main, CanvasWidth, CanvasHeight } from "../../main/Main";
+import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Transaction, CellLoop, StreamSink, CellSink } from "sodiumjs";
 import { BaseContainer } from "../BaseContainer";
-import {Path} from "../../../lib/path/Path";
-import {Bunny} from "./Bunny";
-import {Bunnies_UI} from "./Bunnies_UI";
+import { Path } from "../../../lib/path/Path";
+import { Bunny } from "./Bunny";
+import { Bunnies_UI } from "./Bunnies_UI";
+import { Move, UpdateMove } from "./Bunny_Move";
 
 enum TOUCH {
     DOWN,
     UP
 }
 export class Bunnies extends BaseContainer {
-    private ticker:Ticker;
-    private ui:Bunnies_UI;
-    private unlisteners:Array<() => void>;
-   
+    private ticker: Ticker;
+    private ui: Bunnies_UI;
+    private unlisteners: Array<() => void>;
+
 
     constructor() {
         super();
@@ -25,7 +26,7 @@ export class Bunnies extends BaseContainer {
         Main.app.renderer.plugins.interaction.on('pointerup', () => cTouch.send(TOUCH.UP));
 
         //output
-        const bounds = new PIXI.Rectangle(0,0,CanvasWidth, CanvasHeight);
+        const bounds = new PIXI.Rectangle(0, 0, CanvasWidth, CanvasHeight);
         const ui = new Bunnies_UI();
         this.addChild(ui.status);
 
@@ -35,7 +36,7 @@ export class Bunnies extends BaseContainer {
         //local containers
         const unlisteners = new Array<() => void>();
         const bunnies = new Array<Bunny>();
-        
+
         //stuff that will need to be disposed
         this.unlisteners = unlisteners;
         this.ticker = ticker;
@@ -43,25 +44,43 @@ export class Bunnies extends BaseContainer {
 
         //logic
         const cTouch = new CellSink<TOUCH>(TOUCH.UP);
-        const cLoad =  ui.load();
+        const cLoad = ui.load();
 
         const sReady = ticker.sTicks.gate(cLoad); //prevent anything from happening until ui is loaded
         const sCreating = sReady.gate(cTouch.map(t => t == TOUCH.DOWN ? true : false)); //don't make bunnies unless mouse is down
 
         //render changes
+        /*
         unlisteners.push(
             sReady.listen(deltaTime => 
                 bunnies.forEach(bunny => bunny.update(deltaTime)))
         );
+        */
+
 
         unlisteners.push(
+            //Create bunny when mouse is down
             sCreating.listen(() => {
-                for(let i = 0; i < 100; i++) {
-                    let bunny = new Bunny(this.ui.texture, bounds);
-                bunnies.push(bunny);
-                this.addChild(bunny);
+                for (let i = 0; i < 100; i++) {
+                    let bunnyCell = new CellLoop<Move>();
+                    let bunnyUpdate = ticker.sTicks.snapshot(bunnyCell, (dt, move) => UpdateMove(move, bounds));
+                    bunnyCell.loop(bunnyUpdate.hold(
+                        {
+                            origin: {
+                                x: 0,
+                                y: 0
+                            },
+                            direction: {
+                                x: Math.random() * 10,
+                                y: (Math.random() * 10) - 5
+                            }
+                        }
+                    ));
+                    let bunny = new Bunny(this.ui.texture, bunnyCell);
+                    bunnies.push(bunny);
+                    this.addChild(bunny);
                 }
-                
+
 
                 ui.updateStatus(bunnies.length + " bunnies!");
             })
