@@ -5,8 +5,8 @@ import { Transaction, CellLoop, StreamSink, CellSink } from "sodiumjs";
 import { BaseContainer } from "../BaseContainer";
 import { Path } from "../../../lib/path/Path";
 import { Bunny } from "./Bunny";
-import { Bunnies_UI } from "./Bunnies_UI";
-import { Move, UpdateMove } from "./Bunny_Move";
+import { UI } from "./Bunnies_UI";
+import { Motion, UpdateMotion, NewMotion } from "./Bunny_Motion";
 
 enum TOUCH {
     DOWN,
@@ -14,7 +14,7 @@ enum TOUCH {
 }
 export class Bunnies extends BaseContainer {
     private ticker: Ticker;
-    private ui: Bunnies_UI;
+    private ui: UI;
     private unlisteners: Array<() => void>;
 
 
@@ -27,7 +27,7 @@ export class Bunnies extends BaseContainer {
 
         //output
         const bounds = new PIXI.Rectangle(0, 0, CanvasWidth, CanvasHeight);
-        const ui = new Bunnies_UI();
+        const ui = new UI();
         this.addChild(ui.status);
 
         //time
@@ -62,20 +62,9 @@ export class Bunnies extends BaseContainer {
             //Create bunny when mouse is down
             sCreating.listen(() => {
                 for (let i = 0; i < 100; i++) {
-                    let bunnyCell = new CellLoop<Move>();
-                    let bunnyUpdate = ticker.sTicks.snapshot(bunnyCell, (dt, move) => UpdateMove(move, bounds));
-                    bunnyCell.loop(bunnyUpdate.hold(
-                        {
-                            origin: {
-                                x: 0,
-                                y: 0
-                            },
-                            direction: {
-                                x: Math.random() * 10,
-                                y: (Math.random() * 10) - 5
-                            }
-                        }
-                    ));
+                    let bunnyCell = new CellLoop<Motion>();
+                    let bunnyUpdate = ticker.sTicks.snapshot(bunnyCell, (dt, motion) => UpdateMotion(motion, bounds));
+                    bunnyCell.loop(bunnyUpdate.hold(NewMotion()));
                     let bunny = new Bunny(this.ui.texture, bunnyCell);
                     bunnies.push(bunny);
                     this.addChild(bunny);

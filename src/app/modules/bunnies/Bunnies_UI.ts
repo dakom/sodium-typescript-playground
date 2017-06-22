@@ -2,7 +2,7 @@ import {Path} from "../../../lib/path/Path";
 import {Cell, CellSink} from "sodiumjs";
 import {CanvasWidth} from "../../main/Main";
 
-export class Bunnies_UI {
+export class UI {
     private loader:PIXI.loaders.Loader;
 
     public status:PIXI.Text;

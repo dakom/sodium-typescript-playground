@@ -7,8 +7,12 @@ import * as R from "ramda";
 const SPEED = 10;
 const RADIUS = 50;
 
+interface Motion {
+    x:number;
+    v:number;
+}
+
 export class Ball extends BaseContainer {
-    private vx:number = SPEED;
     private unlistener:() => void;
 
     constructor(private sTicks:Stream<number>) {
@@ -16,28 +20,32 @@ export class Ball extends BaseContainer {
         this.addChild(UI_Ball(RADIUS));
         this.y = CanvasHeight/2;
 
+
         Transaction.run((): void => {
-            let posX = new CellLoop<number>();
-            let sUpdate = sTicks.snapshot(posX, (dt, x) => this.getPosition(dt, x));
-            posX.loop(sUpdate.hold(0));
-            this.unlistener = posX.listen(x => {
+            let cMotion = new CellLoop<Motion>();
+            let sUpdate = sTicks.snapshot(cMotion, (dt, motion) => this.getMotion(dt, motion));
+            cMotion.loop(sUpdate.hold({
+                x: 0,
+                v: SPEED
+            }));
+            this.unlistener = cMotion.listen(motion => {
                 //console.log(x);
-                this.x = x;
+                this.x = motion.x;
             });
         });
     }
 
-    getPosition(dt:number, posX:number):number {
+    getMotion(dt:number, _motion:Motion):Motion {
         let xMin = RADIUS;
         let xMax = CanvasWidth - RADIUS;
+        let xUpdate = R.clamp(xMin, xMax, _motion.x + dt * _motion.v);
+        let motion = R.set(R.lensProp("x"), xUpdate, _motion);
 
-        posX = R.clamp(xMin, xMax, posX + dt * this.vx);
-
-        if(posX == xMin || posX == xMax) {
-            this.vx *= -1;
+        if(motion.x == xMin || motion.x == xMax) {
+            motion.v *= -1;
         }
 
-        return posX;
+        return motion;
     }
 
     dispose() {

@@ -11,7 +11,7 @@ Main.Init();
 
 let stage = Main.app.stage;
 //let topMenu = new TopMenu(stage, undefined);
-let topMenu = new TopMenu(stage, "bunnies");
+let topMenu = new TopMenu(stage, "simple");
 let currentModule: BaseContainer;
 let fps:FPS = new FPS;
 
