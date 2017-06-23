@@ -1,7 +1,6 @@
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Stream, Transaction, CellLoop, Cell } from "sodiumjs";
 import { UpdateMotion, Motion, NewMotion } from "./Bunny_Motion";
-import { BaseContainer } from "../BaseContainer"
 import * as R from "ramda";
 
 export class Bunny extends PIXI.Sprite {
@@ -14,8 +13,10 @@ export class Bunny extends PIXI.Sprite {
         this.motion = NewMotion();
     }
 
-    public render(motion:Motion) {
-        this.x = this.motion.origin.x;
-        this.y = this.motion.origin.y;
+    public render(_motion:Motion) {
+        
+        this.x = _motion.origin.x;
+        this.y = _motion.origin.y;
+        this.motion = _motion;
     }
 }

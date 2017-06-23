@@ -1,7 +1,7 @@
 import { Ticker } from "../../../lib/time/Ticker";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Transaction, CellLoop, StreamSink, CellSink} from "sodiumjs";
-import { BaseContainer } from "../BaseContainer";
+import { BaseContainer } from "../../../lib/display/BaseContainer";
 import { Path } from "../../../lib/path/Path";
 import { Bunny } from "./Bunny";
 import { UI } from "./Bunnies_UI";
@@ -28,6 +28,8 @@ export class Bunnies extends BaseContainer {
         //output
         const bounds = new PIXI.Rectangle(0, 0, CanvasWidth, CanvasHeight);
         const ui = new UI();
+        const bunnyContainer = new PIXI.Container();
+        this.addChild(bunnyContainer);
         this.addChild(ui.status);
 
         //time
@@ -53,8 +55,9 @@ export class Bunnies extends BaseContainer {
         unlisteners.push(
             sReady.listen(() => 
                 bunnies.forEach(b => { 
-                    b.motion = UpdateMotion(b.motion, bounds);
-                    b.render(b.motion);
+                    //note - there was an attempt to use cells for this but it was far less performant
+                    //still, there's very little "side effects" - just bunny.render()
+                    b.render(UpdateMotion(b.motion, bounds));
                 }))
         );
         
@@ -62,18 +65,14 @@ export class Bunnies extends BaseContainer {
         unlisteners.push(
             sCreating.listen(() => {
                 for (let i = 0; i < 100; i++) {
-                    bunnies.push(this.makeBunny());
+                    let bunny = new Bunny(this.ui.texture);
+                    bunnyContainer.addChild(bunny);
+                    bunnies.push(bunny);
                 }
                
                 ui.updateStatus(bunnies.length + " bunnies!");
             })
         );
-    }
-
-    makeBunny():Bunny {
-        let bunny = new Bunny(this.ui.texture);
-        this.addChild(bunny);
-        return bunny;
     }
 
     //called automatically when the container is removed from stage

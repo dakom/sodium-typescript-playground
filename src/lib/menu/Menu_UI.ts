@@ -1,13 +1,15 @@
 const BUTTON_MARGIN = 10;
 const BUTTON_PADDING_X = 10;
 import { PrimitiveFuncs } from "../../lib/funcs/PrimitiveFuncs";
-import { MenuConfig, Configs } from "./TopMenu_Config";
+import {MenuItem} from "./Menu";
 import * as R from 'ramda';
 
-class MenuButton extends PIXI.Container {
+export function Menu_SetLayout(buttons:Array<PIXI.DisplayObject>) {
+    let positions = PrimitiveFuncs.addPadding(BUTTON_PADDING_X, PrimitiveFuncs.accProps("width", buttons));
+    R.zipWith((ref, x) => ref.x = x, buttons, positions);
+}
 
-    constructor(private config: MenuConfig, selected: boolean) {
-        super();
+export function MenuButton_UI(label:string, selected: boolean):PIXI.Graphics {
         let textStyle = selected
             ? new PIXI.TextStyle({
                 fontFamily: 'Arial',
@@ -25,7 +27,7 @@ class MenuButton extends PIXI.Container {
             });
         let bgColor = selected ? 0x595234 : 0x2a2a2a;
         let graphics = new PIXI.Graphics();
-        let text: PIXI.Text = new PIXI.Text(config.label, textStyle);
+        let text: PIXI.Text = new PIXI.Text(label, textStyle);
         graphics.beginFill(bgColor);
         graphics.drawRoundedRect(0, 0, text.width + (BUTTON_MARGIN * 2), text.height + (BUTTON_MARGIN * 2), 10);
         graphics.endFill();
@@ -34,27 +36,6 @@ class MenuButton extends PIXI.Container {
 
         text.x = BUTTON_MARGIN;
         text.y = BUTTON_MARGIN;
-        this.addChild(graphics);
-        this.interactive = this.buttonMode = true;
-
-
-    }
-
-    public get id(): string {
-        return this.config.id;
-    }
-}
-
-export class UI {
-    public static CreateButtons(selectedId): Array<MenuButton> {
-        let buttons = Configs.map(config => new MenuButton(config, config.id === selectedId ? true : false));
-
-        let positions = PrimitiveFuncs.addPadding(BUTTON_PADDING_X,
-            PrimitiveFuncs.accProps("width", buttons));
-
-        R.zipWith((ref, x) => ref.x = x, buttons, positions);
-
-        return buttons;
-    }
+        return graphics;
 }
 

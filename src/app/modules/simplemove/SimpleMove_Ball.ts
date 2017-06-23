@@ -1,7 +1,7 @@
 import {UI_Ball} from "./SimpleMove_UI";
 import {CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Stream, Transaction, CellLoop} from "sodiumjs";
-import {BaseContainer} from "../BaseContainer"
+import { BaseContainer } from "../../../lib/display/BaseContainer";
 import * as R from "ramda";
 
 const SPEED = 10;

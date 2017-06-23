@@ -5,16 +5,16 @@ export class FPS extends PIXI.Text {
     constructor() {
         super()
 
-        let nFps:number = -1;
-
+        
         let ticker = new PIXI.ticker.Ticker();
+        let startTime = Date.now();
+
         ticker.add(() => {
             let rFps = Math.round(ticker.FPS);
-            if(nFps != rFps) {
-                nFps = rFps;
-                this.text = nFps.toString() + " FPS";
-                this.x = (CanvasWidth - this.width) - 20;
-            }
+            let elapsedTime = Math.floor((Date.now() - startTime)/1000);
+
+            this.text = rFps.toString() + " FPS " + elapsedTime + " secs";
+            this.x = (CanvasWidth - this.width) - 20;
         }); 
         ticker.start();
 

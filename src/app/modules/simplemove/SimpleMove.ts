@@ -2,7 +2,7 @@
 import { Ticker } from "../../../lib/time/Ticker";
 import { Transaction, CellLoop } from "sodiumjs";
 import { Ball } from "./SimpleMove_Ball";
-import { BaseContainer } from "../BaseContainer";
+import { BaseContainer } from "../../../lib/display/BaseContainer";
 
 export class SimpleMove extends BaseContainer {
     private ball:Ball;
