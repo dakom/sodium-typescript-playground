@@ -1,15 +1,14 @@
 import { Ticker } from "../../../lib/time/Ticker";
-import { Transaction, CellLoop } from "sodiumjs";
+import { Cell, Transaction, CellLoop } from "sodiumjs";
 import { BaseContainer } from "../../../lib/display/BaseContainer";
-import { Cell } from "sodiumjs";
 import { Character } from "./Switch_Character";
 import { Assets } from "./Switch_Assets";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
-import {CanvasWidth, CanvasHeight } from "../../main/Main";
+import { CanvasWidth, CanvasHeight } from "../../main/Main";
 export class Switch extends BaseContainer {
     private ticker: Ticker;
     private unlisteners: Array<() => void>;
-    private assets:Assets;
+    private assets: Assets;
 
     constructor() {
         super();
@@ -23,7 +22,15 @@ export class Switch extends BaseContainer {
 
         const assets = new Assets();
 
-        const menu = new Menu([CreateMenuItem("bird"),CreateMenuItem("dinosaur")]);
+        const menu = new Menu([CreateMenuItem("bird"), CreateMenuItem("dinosaur")]);
+        menu.y = (CanvasHeight - menu.height) - 100;
+        menu.x = (CanvasWidth - menu.width) / 2;
+
+        const character = new PIXI.Sprite();
+        this.addChild(character);
+
+        //can this be made more pure?
+        let accumTime = 0;
 
         //stuff to dispose
         this.ticker = ticker;
@@ -31,22 +38,26 @@ export class Switch extends BaseContainer {
         this.assets = assets;
 
         //logic
-        const cLoad = assets.load(bird.getPaths().concat(terrex.getPaths()));
+        Transaction.run((): void => {
+            const cLoad = assets.load(bird.getPaths().concat(terrex.getPaths()));
 
-        const sReady = ticker.sTicks.gate(cLoad); //prevent anything from happening until ui is loaded
+            const sReady = ticker.sTicks.gate(cLoad); //prevent anything from happening until ui is loaded
 
-        //pick up from here!
-        this.addChild(bird);
-        this.addChild(menu);
-        menu.y = (CanvasHeight - menu.height) - 100;
-        menu.x = (CanvasWidth - menu.width)/2;
-        
-        unlisteners.push(
-            sReady.listen(deltaTime => {
-                bird.render(deltaTime, assets);
-            })
-        );
+            //limit to some framerate that looks okay - seems to be broken though!
+            const sFrame = sReady.filter(deltaTime => ((accumTime += deltaTime) >= 3));
 
+            //FIX BELOW HERE!!!! USE SWITCHES AND STUFF!!!
+            const cTextureUpdate = new CellLoop<PIXI.Texture>();
+            const sTextureUpdate = sFrame.snapshot(cTextureUpdate, (dt, texture) => bird.getTexture(assets));
+            cTextureUpdate.loop(sTextureUpdate.hold(undefined));
+            
+            unlisteners.push(
+                //update this to be based on the switch!
+                //also - notice that we're listening to the stream instead of the cell - we aren't interested in first value
+                //can we get rid of the cell altogether?
+                sTextureUpdate.listen(texture => character.texture = texture)
+            )
+        });
         //const movies = new Array<Cell<Texture>>();
 
         /*
@@ -84,7 +95,7 @@ export class Switch extends BaseContainer {
 
     dispose() {
         console.log('disposing switch...');
-        
+
         this.ticker.dispose();
         this.unlisteners.forEach(unlistener => unlistener());
         this.assets.dispose();

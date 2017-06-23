@@ -1,17 +1,20 @@
 import { Assets } from "./Switch_Assets";
 import * as R from "ramda";
-import {CanvasWidth, CanvasHeight } from "../../main/Main";
+import { CanvasWidth, CanvasHeight } from "../../main/Main";
+import { CellSink, Cell } from "sodiumjs";
 
 export class Character extends PIXI.Sprite {
     private currentFrame = 0;
-    private accumTime = 0;
 
-    constructor(private baseId: string, private len: number, scale:number) {
+
+    constructor(private baseId: string, private len: number, scale: number) {
         super();
         this.anchor.set(.5, .5);
-        this.x = CanvasWidth/2;
-        this.y = CanvasHeight/2;
-        this.scale.set(scale,scale);
+        this.x = CanvasWidth / 2;
+        this.y = CanvasHeight / 2;
+        this.scale.set(scale, scale);
+
+       
     }
 
     public getPaths(): Array<string> {
@@ -23,6 +26,8 @@ export class Character extends PIXI.Sprite {
         return ret;
     }
 
+   
+
     getPath(frame: number): string {
         let digit = frame.toString();
         if (frame < 10) {
@@ -33,19 +38,15 @@ export class Character extends PIXI.Sprite {
     }
 
     //todo try to make this more pure
-    render(deltaTime: number, assets: Assets) {
-        this.accumTime += deltaTime;
-        if (this.accumTime >= 3) {
-            this.accumTime = 0;
-            this.currentFrame = R.clamp(1, this.len - 1, this.currentFrame);
+    getTexture(assets: Assets):PIXI.Texture {
+        this.currentFrame = R.clamp(1, this.len - 1, this.currentFrame);
 
-            this.texture = assets.getTexture(this.getPath(this.currentFrame));
+        let texture = assets.getTexture(this.getPath(this.currentFrame));
 
-            if (++this.currentFrame === this.len) {
-                this.currentFrame = 0;
-            }
+        if (++this.currentFrame === this.len) {
+            this.currentFrame = 0;
         }
 
-
+        return texture;
     }
 }

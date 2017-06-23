@@ -56,4 +56,4 @@ topMenu.sClicked.listen(id => {
 });
 
 //just for testing
-//topMenu.forceId("switch");
+topMenu.forceId("switch");
