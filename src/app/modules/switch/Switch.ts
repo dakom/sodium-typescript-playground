@@ -1,12 +1,14 @@
-import { Ticker } from "../../../lib/time/Ticker";
-import { Cell, Transaction, CellLoop } from "sodiumjs";
+import { Frames } from "../../../lib/time/Frames";
+import { Cell, Transaction, CellLoop, Stream } from "sodiumjs";
 import { BaseContainer } from "../../../lib/display/BaseContainer";
 import { Character } from "./Switch_Character";
 import { Assets } from "./Switch_Assets";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
+import * as R from "ramda";
+
 export class Switch extends BaseContainer {
-    private ticker: Ticker;
+    private frames: Frames;
     private unlisteners: Array<() => void>;
     private assets: Assets;
 
@@ -14,48 +16,68 @@ export class Switch extends BaseContainer {
         super();
 
         //setup
-        const ticker = new Ticker();
+        const frames = new Frames(3);
         const unlisteners = new Array<() => void>();
-
-        const bird = new Character("bird", 4, 1);
-        const terrex = new Character("terrex", 19, 3);
 
         const assets = new Assets();
 
-        const menu = new Menu([CreateMenuItem("bird"), CreateMenuItem("dinosaur")]);
+        const characters = {
+            bird: new Character("bird", assets, 4, 1),
+            dinosaur: new Character("terrex", assets, 19, 3)
+        }
+
+        const menu = new Menu(Object.keys(characters).map(id => CreateMenuItem(id)));
         menu.y = (CanvasHeight - menu.height) - 100;
         menu.x = (CanvasWidth - menu.width) / 2;
+        this.addChild(menu);
 
         const character = new PIXI.Sprite();
+        character.anchor.set(.5,.5);
+        character.x = CanvasWidth/2;
+        character.y = CanvasHeight/2;
         this.addChild(character);
 
-        //can this be made more pure?
-        let accumTime = 0;
-
         //stuff to dispose
-        this.ticker = ticker;
+        this.frames = frames;
         this.unlisteners = unlisteners;
         this.assets = assets;
 
+        //helper functions
+        function getLoaders():Array<string> {
+            return R.reduce((acc:Array<string>, elem:Array<string>) => acc.concat(elem), 
+                        new Array<string>(), 
+                        //we don't want to rely on es7 object.values yet...
+                        Object.keys(characters).map(key => characters[key] as Character)
+                            .map(chr => chr.paths));
+
+        }
+
         //logic
         Transaction.run((): void => {
-            const cLoad = assets.load(bird.getPaths().concat(terrex.getPaths()));
+            assets.load(getLoaders());
 
-            const sReady = ticker.sTicks.gate(cLoad); //prevent anything from happening until ui is loaded
+            const sFrames = frames.sFrames.gate(assets.cLoad); //prevent anything from happening until ui is loaded
 
-            //limit to some framerate that looks okay - seems to be broken though!
-            const sFrame = sReady.filter(deltaTime => ((accumTime += deltaTime) >= 3));
+           
+            //get selected character
+            const cCharacter = new CellLoop<Character>();
+            cCharacter.loop(menu.sClicked.snapshot(cCharacter, (id, chr) => characters[id]).hold(undefined));
+            
+            //get selected textures
+            const cTextures = cCharacter.map(chr => chr.cTexture);
 
             //FIX BELOW HERE!!!! USE SWITCHES AND STUFF!!!
-            const cTextureUpdate = new CellLoop<PIXI.Texture>();
-            const sTextureUpdate = sFrame.snapshot(cTextureUpdate, (dt, texture) => bird.getTexture(assets));
-            cTextureUpdate.loop(sTextureUpdate.hold(undefined));
+
+            let tex = Cell.switchC(cTextures);
             
+            //update textures... lift?
             unlisteners.push(
                 //update this to be based on the switch!
                 //also - notice that we're listening to the stream instead of the cell - we aren't interested in first value
                 //can we get rid of the cell altogether?
-                sTextureUpdate.listen(texture => character.texture = texture)
+                tex.listen(t => {
+                    character.texture = t; 
+                })
             )
         });
         //const movies = new Array<Cell<Texture>>();
@@ -96,7 +118,7 @@ export class Switch extends BaseContainer {
     dispose() {
         console.log('disposing switch...');
 
-        this.ticker.dispose();
+        this.frames.dispose();
         this.unlisteners.forEach(unlistener => unlistener());
         this.assets.dispose();
     }

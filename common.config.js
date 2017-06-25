@@ -12,7 +12,7 @@ module.exports = (function () {
 
   //when in development mode, force load "remote" external libs from their local folder
   //this is useful when developing offline or if you have a lot of remote libraries
-  var DEV_REMOTE_IS_LOCAL = false;
+  var DEV_REMOTE_IS_LOCAL = true;
 
   //all the libs sitting on the distribution server should be under this folder
   var distLibsPrefix = 'runtime-libs/'; 
