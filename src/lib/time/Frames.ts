@@ -19,13 +19,15 @@ export class Frames {
 
         this.ticker = new PIXI.ticker.Ticker();
         this.ticker.add(deltaTime => {
-            if ((accumTime += deltaTime) >= 3) {
+            if ((accumTime += deltaTime) >= framerate) {
                 accumTime = 0;
                 this.sink.send(accumTime);
             }
         });
 
         this.start();
+
+        
     }
 
     public get sFrames(): Stream<number> {

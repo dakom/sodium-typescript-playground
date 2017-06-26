@@ -18,8 +18,9 @@ export interface MenuItem {
 export class Menu extends PIXI.Container {
     private _sClicked:Stream<string>;
     private _sForceClicked:StreamSink<string>;
+    private _selectedCell:CellLoop<string>;
 
-    constructor(private configs: Array<MenuItem>) {
+    constructor(private configs: Array<MenuItem>, firstId?:string) {
         super();
 
         this.x = 10;
@@ -32,10 +33,10 @@ export class Menu extends PIXI.Container {
             //2. selectedCell is defined in terms of sClicked.hold() 
             //3. sClicked is defined in terms of button.sClicked
             // therefore button (selectedCell) is defined in terms of itself
-            let selectedCell = new CellLoop<string>();
+            this._selectedCell = new CellLoop<string>();
 
             //create the buttons
-            const buttons = configs.map(config => new MenuButton(selectedCell, config));
+            const buttons = configs.map(config => new MenuButton(this._selectedCell, config));
 
             //merge all the button click streams into one
             this._sClicked = R.reduce((acc:Stream<string>, elem:Stream<string>) => acc.orElse(elem), new Stream<string>(), buttons.map(button => button.sClicked));
@@ -45,7 +46,7 @@ export class Menu extends PIXI.Container {
             this._sClicked = this._sClicked.orElse(this._sForceClicked);
 
             //create the cell that holds the value of the clicks
-            selectedCell.loop(this._sClicked.hold(undefined));
+            this._selectedCell.loop(this._sClicked.hold(firstId));
 
             //output - render
             Menu_SetLayout(buttons);
@@ -60,5 +61,9 @@ export class Menu extends PIXI.Container {
 
     public get sClicked():Stream<string> {
         return this._sClicked
+    }
+
+    public get cId():Cell<string> {
+        return this._selectedCell;
     }
 }

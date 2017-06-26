@@ -1,29 +1,28 @@
 import {Path} from "../../../lib/path/Path";
-import {Cell, CellSink} from "sodiumjs";
+import {Stream, StreamSink} from "sodiumjs";
 import {CanvasWidth} from "../../main/Main";
 
 
 export class Assets {
     private loader:PIXI.loaders.Loader;
-    private _cLoad = new CellSink<boolean>(false);
     constructor() {
     }
 
-    load(ids:Array<string>) {
+    load(ids:Array<string>):Stream<boolean> {
         let loader = new PIXI.loaders.Loader();
 
+        const sLoad = new StreamSink<boolean>();
         ids.forEach(id => loader.add(id, Path.GetImagePath(id) + ".png"));
         loader.once("complete", () => {
-            this._cLoad.send(true);
+            sLoad.send(true);
         })
         loader.load();
 
         this.loader = loader;
+        return sLoad;
     }
 
-    public get cLoad():Cell<boolean> {
-        return this._cLoad;
-    }
+    
 
     public getTexture(id:string):PIXI.Texture {
         return this.loader.resources[id].texture;
