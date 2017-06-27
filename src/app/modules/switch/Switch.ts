@@ -18,7 +18,7 @@ export class Switch extends BaseContainer {
         //setup & stuff to dispose
         const characters = {
             bird: new Character("bird", 4, 1),
-            dinosaur: new Character("terrex", 19, 3)
+            dinosaur: new Character("terrex", 19, 5)
         }
 
 
@@ -53,8 +53,11 @@ export class Switch extends BaseContainer {
                 });
 
             Transaction.run((): void => {
-                const cTextures = menu.cId.map(id => (this.characters[id] as Character).cTexture);
-                const cTexture = Cell.switchC(cTextures);            
+
+                const cCharacter = menu.cId.map(id => (this.characters[id] as Character))
+                this.unlisteners.push(cCharacter.listen(chr => character.scale.set(chr.scale, chr.scale)));
+
+                const cTexture = Cell.switchC(cCharacter.map(chr => chr.cTexture));            
                 this.unlisteners.push(cTexture.listen(tex => this.setTexture(character, tex)));
             });
 
@@ -63,7 +66,6 @@ export class Switch extends BaseContainer {
 
     }
 
-    
     setTexture(spr:PIXI.Sprite, tex:PIXI.Texture) {
 
         if(tex === undefined || tex === null) {

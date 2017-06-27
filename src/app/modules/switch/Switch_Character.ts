@@ -4,19 +4,14 @@ import { CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Transaction, CellSink, Cell, Stream, CellLoop } from "sodiumjs";
 import { Frames } from "../../../lib/time/Frames";
 
-export class Character extends PIXI.Sprite {
+export class Character  {
     private _textures: Array<PIXI.Texture>;
     private _paths: Array<string>;
     private _cFrame:CellLoop<number>;
 
     private frames:Frames;
 
-    constructor(private baseId: string, private len: number, scale: number) {
-        super();
-        this.anchor.set(.5, .5);
-        this.x = CanvasWidth / 2;
-        this.y = CanvasHeight / 2;
-        this.scale.set(scale, scale);
+    constructor(private baseId: string, private len: number, public scale: number) {
 
         this._paths = new Array<string>();
         for (let i = 1; i < len; i++) {
