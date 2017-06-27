@@ -52,49 +52,25 @@ export class Switch extends BaseContainer {
 
                 });
 
-
-
             Transaction.run((): void => {
-                const cCharacter = menu.cId.map(id => (this.characters[id] as Character));
-                const cTextures = cCharacter.map(chr => chr.cTexture);
-
-                const cTexture = Cell.switchC(cTextures);
-                this.unlisteners.push(
-                    cTexture.listen(tex => {
-                        //can this be moved to a filter?
-                        if (tex !== undefined && tex !== null) {
-                            character.texture = tex;
-                        }
-                    })
-                );
-
-                //Log the current choice to the console - 
-
-                /*
-                    NOTE
-                    Switch wasn't really necessary for this example... the following is simpler and works too
-                    Though the source code was changed to accommodate the switch and this is now broken
-                */
-                /*
-                const cTicker = this.frames.sFrames.hold(0);
-                const cTexture = cTicker.lift(menu.cId.map(id => (this.characters[id] as Character)),
-                    (n, chr) => {
-                        chr.updateFrame();
-                        return chr.fTexture;
-                    }
-                )
-                cTexture.listen(tex => character.texture = tex);
-
-                this.frames.start();
-                */
+                const cTextures = menu.cId.map(id => (this.characters[id] as Character).cTexture);
+                const cTexture = Cell.switchC(cTextures);            
+                this.unlisteners.push(cTexture.listen(tex => this.setTexture(character, tex)));
             });
 
         });
-        //wait for load of assets
         this.unlisteners.push(unlistener);
 
     }
 
+    
+    setTexture(spr:PIXI.Sprite, tex:PIXI.Texture) {
+
+        if(tex === undefined || tex === null) {
+            return;
+        }
+        spr.texture = tex;
+    }
     getCharacters(): Array<Character> {
         //we don't want to rely on es7 object.values yet...
         return Object.keys(this.characters).map(key => this.characters[key] as Character);
