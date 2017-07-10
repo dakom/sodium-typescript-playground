@@ -4,6 +4,7 @@ import { SimpleMove } from "./modules/simplemove/SimpleMove";
 import { Switch } from "./modules/switch/Switch";
 import { Bunnies } from "./modules/bunnies/Bunnies";
 import {Draw} from "./modules/draw/Draw";
+import {Move} from "./modules/move/Move";
 import { CellLoop, StreamSink, Cell, Transaction } from "sodiumjs"
 import { BaseContainer } from "../lib/display/BaseContainer";
 import { FPS } from "./fps/FPS";
@@ -18,8 +19,8 @@ const topMenu = new Menu([
     CreateMenuItem("bunnies"),
     CreateMenuItem("switch"),
     CreateMenuItem("draw"),
-    CreateMenuItem("select"),
-    CreateMenuItem("select_and_draw", "select + draw")
+    CreateMenuItem("move"),
+    CreateMenuItem("move_and_draw", "move + draw")
 ]);
 stage.addChild(topMenu);
 
@@ -43,8 +44,10 @@ topMenu.sClicked.listen(id => {
             break;
         case "switch": currentModule = new Switch();
             break;
-            
+
             case "draw": currentModule = new Draw();
+            break;
+            case "move": currentModule = new Move();
             break;
     }
 
@@ -59,4 +62,4 @@ topMenu.sClicked.listen(id => {
 });
 
 //just for testing
-topMenu.forceId("draw");
+topMenu.forceId("move");
