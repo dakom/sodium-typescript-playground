@@ -2,8 +2,8 @@ import { Main } from "./main/Main";
 import { Menu, CreateMenuItem } from "../lib/menu/Menu";
 import { SimpleMove } from "./modules/simplemove/SimpleMove";
 import { Switch } from "./modules/switch/Switch";
-
 import { Bunnies } from "./modules/bunnies/Bunnies";
+import {Draw} from "./modules/draw/Draw";
 import { CellLoop, StreamSink, Cell, Transaction } from "sodiumjs"
 import { BaseContainer } from "../lib/display/BaseContainer";
 import { FPS } from "./fps/FPS";
@@ -43,6 +43,9 @@ topMenu.sClicked.listen(id => {
             break;
         case "switch": currentModule = new Switch();
             break;
+            
+            case "draw": currentModule = new Draw();
+            break;
     }
 
     if (currentModule !== undefined) {
@@ -56,4 +59,4 @@ topMenu.sClicked.listen(id => {
 });
 
 //just for testing
-topMenu.forceId("switch");
+topMenu.forceId("draw");

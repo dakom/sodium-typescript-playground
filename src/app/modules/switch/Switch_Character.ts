@@ -4,6 +4,10 @@ import { CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Transaction, CellSink, Cell, Stream, CellLoop } from "sodiumjs";
 import { Frames } from "../../../lib/time/Frames";
 
+export class CharacterConfig {
+    constructor(public readonly baseId: string, public readonly len: number, public readonly scale: number) {}
+}
+
 export class Character  {
     private _textures: Array<PIXI.Texture>;
     private _paths: Array<string>;
@@ -11,10 +15,10 @@ export class Character  {
 
     private frames:Frames;
 
-    constructor(private baseId: string, private len: number, public scale: number) {
+    constructor(public readonly config:CharacterConfig) {
 
         this._paths = new Array<string>();
-        for (let i = 1; i < len; i++) {
+        for (let i = 1; i < config.len; i++) {
             this._paths.push(this.getPath(i));
         }
 
@@ -23,7 +27,7 @@ export class Character  {
             this._cFrame.listen(() => {});
             this.frames = new Frames(3);
             const sFrameUpdate = this.frames.sFrames.snapshot(this._cFrame, (dt, val) => {
-                if(val == len -1) {
+                if(val == config.len -1) {
                     val = 0;
                 }
 
@@ -47,7 +51,7 @@ export class Character  {
     }
     public prepAssets(assets: Assets) {
         this._textures = new Array<PIXI.Texture>();
-        for (let i = 1; i < this.len; i++) {
+        for (let i = 1; i < this.config.len; i++) {
             this._textures.push(assets.getTexture(this.getPath(i)))
         }
        
@@ -69,6 +73,6 @@ export class Character  {
             digit = "0" + frame;
         }
 
-        return this.baseId + "/" + this.baseId + "_" + digit;
+        return this.config.baseId + "/" + this.config.baseId + "_" + digit;
     }
 }

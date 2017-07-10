@@ -5,7 +5,7 @@ const appBackgroundColor = 0xF0EAD2;
 const pageBackgroundColor = "#091D27";
 
 export class Main {
-    public  static app: PIXI.Application;
+    public static app: PIXI.Application;
 
     public static Init() {
         //SETUP DISPLAY
