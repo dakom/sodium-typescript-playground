@@ -1,4 +1,4 @@
-import {UI_Ball} from "./SimpleMove_UI";
+import {UI_Ball} from "./Simple_UI";
 import {CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Stream, Transaction, CellLoop} from "sodiumjs";
 import { BaseContainer } from "../../../lib/display/BaseContainer";

@@ -52,7 +52,7 @@ export class Switch extends BaseContainer {
                 });
 
             Transaction.run((): void => {
-
+                //logic
                 const cCharacter = menu.cId.map(id => (this.characters[id] as Character))
                 this.unlisteners.push(cCharacter.listen(chr => sprite.scale.set(chr.config.scale, chr.config.scale)));
 

@@ -9,8 +9,6 @@ export enum TouchType {
     END
 }
 
-
-
 export interface TouchInfo {
     type: TouchType;
     point: Point;
@@ -21,8 +19,6 @@ export class TouchManager {
     private _sTouch:Stream<TouchInfo>;
 
     constructor(private target: PIXI.Sprite) {
-        const touchPoint: PIXI.Point = new PIXI.Point();
-
         //basic touch setup... raw touches are internal only.
         const sRawTouch = new StreamSink<TouchInfo>();
 
@@ -32,7 +28,7 @@ export class TouchManager {
         target.on('pointerupoutside', evt => updateRawTouch(TouchType.END, evt));
 
         function updateRawTouch(touchType: TouchType, evt: PIXI.interaction.InteractionEvent) {
-            evt.data.getLocalPosition(evt.currentTarget, touchPoint, evt.data.global);
+            let touchPoint = evt.data.getLocalPosition(evt.currentTarget, undefined, evt.data.global);
             sRawTouch.send({
                 type: touchType,
                 point: {

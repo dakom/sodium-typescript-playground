@@ -1,15 +1,35 @@
-export class Shape extends PIXI.Graphics {
-    private _selected:boolean = true;
+import { Transaction, CellLoop, StreamSink, Stream, Cell, CellSink} from "sodiumjs";
 
-    constructor(private sType:string, private fillColor:number, private borderColor:number) {
+export class Shape extends PIXI.Graphics {
+    private _selected:boolean = false;
+    private _sTouchStart:StreamSink<PIXI.interaction.InteractionEvent>;
+   
+    constructor(private sType:string, private _color:number, private borderColor:number) {
         super();
+        
+        const sTouchStart = new StreamSink<PIXI.interaction.InteractionEvent>();
+   
+        this._sTouchStart = sTouchStart;
+        this.interactive = this.buttonMode = true;
+        
+        this.on('pointerdown', evt => this._sTouchStart.send(evt));        
+
+        this.redraw();
+    }
+
+    public get sTouchStart():Stream<PIXI.interaction.InteractionEvent> {
+        return this._sTouchStart;
+    }
+
+    public set selected(val:boolean) {
+        this._selected = val;
         this.redraw();
     }
 
 
     redraw() {
         this.clear();
-        this.beginFill(this.fillColor, this._selected ? 1 : 0);
+        this.beginFill(this._color, this._selected ? 1 : 0);
         this.lineStyle(2, this.borderColor);
         switch(this.sType) {
             case "circle": this.drawCircle(0,0,50); break;

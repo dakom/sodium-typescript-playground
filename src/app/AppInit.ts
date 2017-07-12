@@ -1,6 +1,6 @@
 import { Main } from "./main/Main";
 import { Menu, CreateMenuItem } from "../lib/menu/Menu";
-import { SimpleMove } from "./modules/simplemove/SimpleMove";
+import { Simple } from "./modules/simple/Simple";
 import { Switch } from "./modules/switch/Switch";
 import { Bunnies } from "./modules/bunnies/Bunnies";
 import {Draw} from "./modules/draw/Draw";
@@ -38,7 +38,7 @@ topMenu.sClicked.listen(id => {
     }
 
     switch (id) {
-        case "simple": currentModule = new SimpleMove();
+        case "simple": currentModule = new Simple();
             break;
         case "bunnies": currentModule = new Bunnies();
             break;
