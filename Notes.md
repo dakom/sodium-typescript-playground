@@ -70,7 +70,7 @@ export class (with _simple_ inheritence - e.g. a base class that automatically c
 
 Since this is still early on and I haven't built a large-scale application with this approach yet, it might need adaptation- but it's working so far :D
 
-# Listen and Send
+# Listen
 
 ## Listen is the end - and it's really for side-effects
 
