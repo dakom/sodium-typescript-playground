@@ -5,7 +5,6 @@ import { Character, CharacterConfig } from "./Switch_Character";
 import { Assets } from "./Switch_Assets";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
-import * as R from "ramda";
 
 export class Switch extends BaseContainer {
     private unlisteners: Array<() => void>;
@@ -40,9 +39,10 @@ export class Switch extends BaseContainer {
         this.addChild(sprite);
 
         //get all the loaders of all the characters
-        const sLoad = this.assets.load(R.reduce((acc: Array<string>, elem: Array<string>) => acc.concat(elem),
-            new Array<string>(),
-            this.getCharacters().map(chr => chr.paths)));
+        const sLoad = this.assets.load(
+            this.getCharacters()
+                .map(chr => chr.paths)
+                .reduce((acc: Array<string>, elem: Array<string>) => acc.concat(elem), new Array<string>()))
 
         
         this.unlisteners.push(sLoad.listen(ready => {

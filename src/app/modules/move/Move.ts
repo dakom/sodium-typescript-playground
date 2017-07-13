@@ -3,7 +3,6 @@ import { BaseContainer } from "../../../lib/display/BaseContainer";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Shape } from "./Move_Shape";
-import * as R from "ramda";
 
 export class Move extends BaseContainer {
     private unlisteners: Array<() => void>;
@@ -49,6 +48,7 @@ export class Move extends BaseContainer {
             //hold the value in a cell
             const cPosition = sMovePosition.hold(new PIXI.Point());
 
+            
             //listeners - only to apply the changes visually
             this.unlisteners.push(
                 sTouchStart.listen(evt => {
@@ -61,9 +61,11 @@ export class Move extends BaseContainer {
                 cInitPosition.listen(() => {}),
 
                 sMovePosition.listen(position => {
+            
                     cShape.lift3(cInitPosition, cPosition, (shape, initPos, pos) => {
                         shape.position.set(pos.x - initPos.x, pos.y - initPos.y);
                     });
+            
                 }),
 
                 sEnd.listen(evt => {

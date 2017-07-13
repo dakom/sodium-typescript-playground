@@ -7,8 +7,6 @@ import { Brush } from "./Draw_Brush";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
 
-import * as R from "ramda";
-
 export interface Point {
     x: number;
     y: number;

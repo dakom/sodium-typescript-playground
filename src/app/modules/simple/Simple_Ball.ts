@@ -2,7 +2,7 @@ import {UI_Ball} from "./Simple_UI";
 import {CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Stream, Transaction, CellLoop} from "sodiumjs";
 import { BaseContainer } from "../../../lib/display/BaseContainer";
-import * as R from "ramda";
+declare const R;
 
 const SPEED = 10;
 const RADIUS = 50;

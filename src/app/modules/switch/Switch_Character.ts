@@ -1,5 +1,4 @@
 import { Assets } from "./Switch_Assets";
-import * as R from "ramda";
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Transaction, CellSink, Cell, Stream, CellLoop } from "sodiumjs";
 import { Frames } from "../../../lib/time/Frames";
