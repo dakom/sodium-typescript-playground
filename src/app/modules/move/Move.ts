@@ -57,7 +57,7 @@ export class Move extends BaseContainer {
                     });
                 }),
                 
-                //TODO - remove this... maybe use lambda below?
+                //For some reason this is required for initPos below to be valid....
                 cInitPosition.listen(() => {}),
 
                 sMovePosition.listen(position => {
