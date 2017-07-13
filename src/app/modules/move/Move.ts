@@ -16,6 +16,10 @@ export class Move extends BaseContainer {
         const shapes = this.createShapes();
 
         Transaction.run((): void => {
+            //move and end event streams (triggered globally)
+            const sMove = new StreamSink<PIXI.interaction.InteractionEvent>();
+            const sEnd = new StreamSink<PIXI.interaction.InteractionEvent>();
+
             //get first touch from all shapes into one stream
             const sTouchStart = shapes
                 .map(shape => shape.sTouchStart)
@@ -26,20 +30,16 @@ export class Move extends BaseContainer {
             const cShape = sTouchStart
                 .map(evt => evt.currentTarget as Shape).hold(null);
 
-            //get move and end event streams
-            const sMove = new StreamSink<PIXI.interaction.InteractionEvent>();
-            const sEnd = new StreamSink<PIXI.interaction.InteractionEvent>();
+            //get the init position offset when an object is touched
+            const cInitPosition = sTouchStart
+                .map(evt => evt.data.getLocalPosition(evt.currentTarget, undefined, evt.data.global))
+                .hold(new PIXI.Point());
 
             //dragging state (boolean, whether there's a valid event in sTouchStart or not)
             const cDragging = sTouchStart
                 .orElse(sEnd)
                 .map(evt => evt === null ? false : true)
                 .hold(false);
-
-            //get the init position offset when an object is touched
-            const cInitPosition = sTouchStart
-                .map(evt => evt.data.getLocalPosition(evt.currentTarget, undefined, evt.data.global))
-                .hold(new PIXI.Point());
 
             //get the move position
             const sMovePosition = sMove
