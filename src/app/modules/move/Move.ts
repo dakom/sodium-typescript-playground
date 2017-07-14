@@ -50,9 +50,10 @@ export class Move extends BaseContainer {
                 .gate(cDragging) //but only if we're dragging
                 .snapshot(cShape, (evt, shape) => evt.data.getLocalPosition(shape.parent, undefined, evt.data.global));
         
-            //get a function to update the position
+            //get a function to update the position based on shape, move position, and init position
+            //note that the function isn't actually *called* here - that side-effect is deferred to sUpdatePosition.listen()
             const sUpdatePosition = sMovePosition
-                .snapshot3(cShape, cInitPosition, (pos, shape, initPos) => () => shape.position.set(pos.x - initPos.x, pos.y - initPos.y))
+                .snapshot3(cShape, cInitPosition, (pos, shape, initPos) => () => shape.position.set(pos.x - initPos.x, pos.y - initPos.y));
             
             //listeners - only to apply the changes visually
             this.unlisteners.push(
