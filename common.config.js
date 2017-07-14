@@ -44,7 +44,9 @@ module.exports = (function () {
   
   See common.config.js in the master branch for example
 */
-  var webpackExcludes = [];
+  var webpackExcludes = [{ 
+    ramda: 'R'
+  }];
 
 
   /*

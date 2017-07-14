@@ -1,3 +1,5 @@
+import * as R from "ramda";
+
 import { PrimitiveFuncs } from "../../lib/funcs/PrimitiveFuncs";
 import { Cell, CellLoop, CellSink, StreamSink, Transaction, Stream, StreamLoop } from "sodiumjs";
 import { MenuButton } from "./Menu_Button";

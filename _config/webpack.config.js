@@ -10,7 +10,7 @@ module.exports = {
     entry: CommonConfig.GetWebpackEntries(process.env.NODE_ENV),
     
     resolve: {
-        extensions: ['.ts', '.tsx', '.js']
+        extensions: ['.ts', '.js']
     },
     output: {
         path: path.resolve(__dirname, '../' + CommonConfig.GetWebpackOutputFolder(process.env.NODE_ENV)),

@@ -2,9 +2,10 @@ const BUTTON_MARGIN = 10;
 const BUTTON_PADDING_X = 10;
 import { PrimitiveFuncs } from "../../lib/funcs/PrimitiveFuncs";
 import {MenuItem} from "./Menu";
+import * as R from "ramda";
 
 export function Menu_SetLayout(buttons:Array<PIXI.DisplayObject>) {
-    let positions = PrimitiveFuncs.addPadding(BUTTON_PADDING_X, PrimitiveFuncs.accProps("width", buttons));
+    let positions = PrimitiveFuncs.addPadding(BUTTON_PADDING_X, PrimitiveFuncs.accPropsLeadingZero("width", buttons));
     R.zipWith((ref, x) => ref.x = x, buttons, positions);
 }
 

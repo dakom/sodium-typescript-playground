@@ -1,3 +1,5 @@
+import * as R from "ramda";
+
 import {UI_Ball} from "./Simple_UI";
 import {CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Stream, Transaction, CellLoop} from "sodiumjs";

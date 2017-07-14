@@ -4,11 +4,16 @@ import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Shape } from "./Move_Shape";
 
+class Tuple3<A,B,C> {
+    constructor(public readonly a : A, public readonly b : B, public readonly c : C) { }
+}
+
 export class Move extends BaseContainer {
     private unlisteners: Array<() => void>;
 
     constructor() {
         super();
+
         this.unlisteners = new Array<() => void>();
 
 
@@ -44,10 +49,10 @@ export class Move extends BaseContainer {
             const sMovePosition = sMove
                 .gate(cDragging) //but only if we're dragging
                 .snapshot(cShape, (evt, shape) => evt.data.getLocalPosition(shape.parent, undefined, evt.data.global));
-            
-            //hold the value in a cell
-            const cPosition = sMovePosition.hold(new PIXI.Point());
-
+        
+            //get a function to update the position
+            const sUpdatePosition = sMovePosition
+                .snapshot3(cShape, cInitPosition, (pos, shape, initPos) => () => shape.position.set(pos.x - initPos.x, pos.y - initPos.y))
             
             //listeners - only to apply the changes visually
             this.unlisteners.push(
@@ -57,16 +62,7 @@ export class Move extends BaseContainer {
                     });
                 }),
                 
-                //For some reason this is required for initPos below to be valid....
-                cInitPosition.listen(() => {}),
-
-                sMovePosition.listen(position => {
-            
-                    cShape.lift3(cInitPosition, cPosition, (shape, initPos, pos) => {
-                        shape.position.set(pos.x - initPos.x, pos.y - initPos.y);
-                    });
-            
-                }),
+                sUpdatePosition.listen(updatePosition => updatePosition()),
 
                 sEnd.listen(evt => {
                     shapes.forEach(shape => {
