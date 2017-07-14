@@ -52,7 +52,7 @@ This is rather elegant imho - ultimately the logic is driven by just a few lines
 
 Drawing via PIXI rendertexture. This is an example of separating not just frp vs. ui, but separating the input out as well in a purer way.
 
-## Move (work-in-progress)
+## Move
 
 Moving different items around where state is handled by the parent container (allowing for setting the other inactive items as well)
 
