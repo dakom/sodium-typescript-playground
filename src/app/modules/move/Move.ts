@@ -57,14 +57,17 @@ export class Move extends BaseContainer {
             
             //listeners - only to apply the changes visually
             this.unlisteners.push(
+                //apply changes when an object is first touched
                 sTouchStart.listen(evt => {
                     shapes.forEach(shape => {
                         shape.selected = (evt.currentTarget === shape)
                     });
                 }),
                 
+                //apply changes when an object is being moved
                 sUpdatePosition.listen(updatePosition => updatePosition()),
 
+                //apply changes when an object is released
                 sEnd.listen(evt => {
                     shapes.forEach(shape => {
                         shape.selected = false;
