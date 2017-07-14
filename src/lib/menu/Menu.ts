@@ -3,8 +3,6 @@ import { Cell, CellLoop, CellSink, StreamSink, Transaction, Stream, StreamLoop }
 import { MenuButton } from "./Menu_Button";
 import { Menu_SetLayout } from "./Menu_UI";
 
-declare const R;
-
 export function CreateMenuItem(id: string, label?: string): MenuItem {
     return {
         id: id,

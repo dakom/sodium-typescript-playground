@@ -1,5 +1,3 @@
-declare const R;
-
 export class PrimitiveFuncs {
     //takes a padding and a list of numbers
     //adds the padding into them sequentially increasing to give it space

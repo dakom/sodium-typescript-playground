@@ -3,8 +3,6 @@ const BUTTON_PADDING_X = 10;
 import { PrimitiveFuncs } from "../../lib/funcs/PrimitiveFuncs";
 import {MenuItem} from "./Menu";
 
-declare const R;
-
 export function Menu_SetLayout(buttons:Array<PIXI.DisplayObject>) {
     let positions = PrimitiveFuncs.addPadding(BUTTON_PADDING_X, PrimitiveFuncs.accProps("width", buttons));
     R.zipWith((ref, x) => ref.x = x, buttons, positions);

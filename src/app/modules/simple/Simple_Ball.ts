@@ -2,7 +2,6 @@ import {UI_Ball} from "./Simple_UI";
 import {CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Stream, Transaction, CellLoop} from "sodiumjs";
 import { BaseContainer } from "../../../lib/display/BaseContainer";
-declare const R;
 
 const SPEED = 10;
 const RADIUS = 50;
@@ -37,7 +36,7 @@ export class Ball extends BaseContainer {
         let xMax = CanvasWidth - RADIUS;
         let xUpdate = R.clamp(xMin, xMax, _motion.x + dt * _motion.v);
         let motion = R.set(R.lensProp("x"), xUpdate, _motion);
-
+        
         if(motion.x == xMin || motion.x == xMax) {
             motion.v *= -1;
         }
