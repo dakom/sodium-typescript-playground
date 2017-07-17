@@ -36,6 +36,8 @@ export class UI {
     }
 
     dispose():void {
+        this.texture.destroy();
         this.loader.reset();
+        
     }
 }

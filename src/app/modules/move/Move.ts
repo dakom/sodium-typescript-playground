@@ -65,7 +65,7 @@ export class Move extends BaseContainer {
                 }),
                 
                 //apply changes when an object is being moved
-                sUpdatePosition.listen(updatePosition => updatePosition()),
+                sUpdatePosition.listen(updatePositionCallback => updatePositionCallback()),
 
                 //apply changes when an object is released
                 sEnd.listen(evt => {

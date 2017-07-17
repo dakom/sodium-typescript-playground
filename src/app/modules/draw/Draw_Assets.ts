@@ -28,6 +28,7 @@ export class Assets {
     }
 
     dispose():void {
+        this.getTexture().destroy();
         this.loader.reset();
     }
 }

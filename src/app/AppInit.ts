@@ -3,6 +3,7 @@ import { Menu, CreateMenuItem } from "../lib/menu/Menu";
 import { Simple } from "./modules/simple/Simple";
 import { Switch } from "./modules/switch/Switch";
 import { Bunnies } from "./modules/bunnies/Bunnies";
+import { DrumMachine } from "./modules/drum_machine/DrumMachine";
 import {Draw} from "./modules/draw/Draw";
 import {Move} from "./modules/move/Move";
 import { CellLoop, StreamSink, Cell, Transaction } from "sodiumjs"
@@ -22,7 +23,7 @@ const topMenu = new Menu([
     CreateMenuItem("switch"),
     CreateMenuItem("draw"),
     CreateMenuItem("move"),
-    CreateMenuItem("move_and_draw", "move + draw")
+    CreateMenuItem("drum_machine", "drum machine")
 ]);
 stage.addChild(topMenu);
 
@@ -46,10 +47,11 @@ topMenu.sClicked.listen(id => {
             break;
         case "switch": currentModule = new Switch();
             break;
-
-            case "draw": currentModule = new Draw();
+        case "draw": currentModule = new Draw();
             break;
-            case "move": currentModule = new Move();
+        case "move": currentModule = new Move();
+            break;
+        case "drum_machine": currentModule = new DrumMachine();
             break;
     }
 
@@ -64,4 +66,4 @@ topMenu.sClicked.listen(id => {
 });
 
 //just for testing
-topMenu.forceId("move");
+topMenu.forceId("drum_machine");

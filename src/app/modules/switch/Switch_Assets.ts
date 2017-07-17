@@ -5,10 +5,12 @@ import {CanvasWidth} from "../../main/Main";
 
 export class Assets {
     private loader:PIXI.loaders.Loader;
+   
     constructor() {
     }
 
     load(ids:Array<string>):Stream<boolean> {
+       
         let loader = new PIXI.loaders.Loader();
 
         const sLoad = new StreamSink<boolean>();
@@ -22,13 +24,16 @@ export class Assets {
         return sLoad;
     }
 
-    
-
     public getTexture(id:string):PIXI.Texture {
         return this.loader.resources[id].texture;
     }
 
     dispose():void {
+        Object.keys(this.loader.resources)
+            .forEach(key => {
+                let texture = this.loader.resources[key].texture;
+                texture.destroy();
+            });
         this.loader.reset();
     }
 }
