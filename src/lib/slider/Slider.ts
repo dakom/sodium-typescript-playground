@@ -1,61 +1,80 @@
-class Knob {
+import { Transaction, StreamSink, Stream, Cell, Tuple2 } from "sodiumjs";
+import { Draggable, HorizontalValidator, VerticalValidator, DraggableAxisLock } from "../draggable/Draggable";
+import * as R from "ramda";
 
+export enum Direction {
+    HORIZONTAL,
+    VERTICAL
 }
 
 export interface SliderOptions {
-    knobWidth:number;
-    knobColor:number;
-    bgColor:number;
+    initPerc: number;
+    dir: Direction;
+    knob: {
+        radius: number;
+        color: number;
+    }
+    track: {
+        sizeX: number;
+        sizeY: number;
+        color: number;
+    }
 }
 
 export class Slider extends PIXI.Container {
+    public sPerc: Stream<number>
 
-        private xMin:number = 0;
-        private xMax:number;
+    private _sForced: StreamSink<PIXI.Point>;
+    private _knob:PIXI.DisplayObject;
+
+    constructor(private opts: SliderOptions) {
+        super();
+
+        //limits setup
+        const min = opts.knob.radius;
+        const max = (opts.dir === Direction.HORIZONTAL) ? (opts.track.sizeX - opts.knob.radius) : (opts.track.sizeY - opts.knob.radius);
         
-        constructor(width:number, height:number, opts:SliderOptions)  {
-            super();
-
-            this.xMax = width - opts.knobWidth;
-
-            const bg = new PIXI.Graphics();
-            bg.beginFill(opts.bgColor);
-            bg.drawRect(0, 0, width, height);
-            bg.endFill();
-            this.addChild(bg);
-
-            const knobGraphic = new PIXI.Graphics();
-            knobGraphic.beginFill(opts.knobColor);
-            knobGraphic.drawRect(0, 0, opts.knobWidth, height);
-            knobGraphic.endFill();
+        //utility function
+        function getPerc(pos:number):number {
+            const clamp = R.clamp(0,1);
+            const p = (pos - min) / (max - min);
+            return clamp((opts.dir === Direction.VERTICAL) ? 1 - p : p);
         }
-        
 
-        /*
+        function getPosition(perc:number):number {
+            const clamp = R.clamp(min, max);
+            const p = (opts.dir === Direction.VERTICAL) ? 1 - perc : perc;
+            return clamp((p * (max - min)) + min);
+        }
 
-        
+        //ui setup
+        const bg = new PIXI.Graphics();
+        bg.beginFill(opts.track.color);
+        bg.drawRect(0, 0, opts.track.sizeX, opts.track.sizeY);
+        bg.endFill();
+        this.addChild(bg);
 
-        _self.knob = new TJ.Interactions.Draggable(null, {
-            onDragMove: function(obj, info) {
-              if(opts.onUpdate !== undefined) {
-                opts.onUpdate(_self.getPerc());
-              }
-            },
-            lockY: true,
-            xMin: 0,
-            xMax: width - opts.knobWidth,
+        const knob = new PIXI.Graphics();
+        knob.beginFill(opts.knob.color);
+        knob.drawCircle(0, 0, opts.knob.radius);
+        knob.endFill();
+        this._knob = knob;
+        this.addChild(knob);
+
+        knob.x = (opts.dir === Direction.HORIZONTAL) ? getPosition(opts.initPerc) : opts.track.sizeX / 2;
+        knob.y = (opts.dir === Direction.VERTICAL) ? getPosition(opts.initPerc) : opts.track.sizeY / 2;
+
+        //frp transaction
+        Transaction.run((): void => {
+            //create dragger
+            const kDrag = new Draggable(knob,
+                (opts.dir === Direction.HORIZONTAL) ? HorizontalValidator(min, max) : VerticalValidator(min, max),
+                (opts.dir === Direction.HORIZONTAL) ? DraggableAxisLock.Y : DraggableAxisLock.X
+            );
+
+            //set perc stream for reading
+            this.sPerc = kDrag.sMove
+                            .map(t => getPerc((opts.dir === Direction.HORIZONTAL) ? t.b.x : t.b.y))
         });
-
-        _self.knob.addChild(knobGraphic);
-        _self.addChild(_self.knob);
-        */
-    
-        /*
-    public get perc():number {
-      return(this.knob.x / this.xMax);
     }
-    public set perc(val:number) {
-      return(this.knob.x = val * this.xMax);
-    }
-    */
 }

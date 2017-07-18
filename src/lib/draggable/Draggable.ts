@@ -1,6 +1,16 @@
 import { Transaction, StreamSink, Stream, Cell, Tuple2 } from "sodiumjs";
 import { Main } from "../../app/main/Main";
 
+export enum DraggableAxisLock {
+    NONE,
+    X,
+    Y,
+    BOTH
+}
+export interface DraggableValidator {
+    (displayTarget: PIXI.DisplayObject, point:PIXI.Point): boolean;
+}
+
 export class Draggable {
     //streams for listening externally
     //for move, use the provided point rather than the DisplayObject position
@@ -15,8 +25,18 @@ export class Draggable {
     private dispatchMove: (evt: PIXI.interaction.InteractionEvent) => void;
     private dispatchEnd: (evt: PIXI.interaction.InteractionEvent) => void;
 
-    constructor(private displayTarget: PIXI.DisplayObject) {
+    constructor(private displayTarget: PIXI.DisplayObject, validator?:DraggableValidator, axisLock?:DraggableAxisLock) {
+        displayTarget.interactive = displayTarget.buttonMode = true;
+
         this.unlisteners = new Array<() => void>();
+
+        if(validator === undefined) {
+            validator = (displayTarget, point) => true;
+        }
+
+        if(axisLock === undefined) {
+            axisLock = DraggableAxisLock.NONE;
+        }
 
         Transaction.run((): void => {
             //touch streams
@@ -37,15 +57,31 @@ export class Draggable {
                 .hold(false);
 
             //get the move position, only if we're dragging
-            const sMovePosition = sTouchMove
+            const sMovePositionTest = sTouchMove
                 .gate(cDraggingGate)
                 .snapshot(cInitPosition, (evt, initPos) => {
-                    //map to coordinates based on stage since move is listening globally
-                    const pos = evt.data.getLocalPosition(Main.app.stage, undefined, evt.data.global);
-                    return new PIXI.Point(pos.x - initPos.x, pos.y - initPos.y)
-                })
+                    //map to coordinates based on parent
+                    const pos = evt.data.getLocalPosition(displayTarget.parent, undefined, evt.data.global);
+                    pos.x -= initPos.x;
+                    pos.y -= initPos.y;
 
-            //assignments for external use
+                    //account for axis lock
+                    if(axisLock === DraggableAxisLock.X || axisLock === DraggableAxisLock.BOTH) {
+                        pos.x = displayTarget.x;
+                    }
+                    if(axisLock === DraggableAxisLock.Y || axisLock === DraggableAxisLock.BOTH) {
+                        pos.y = displayTarget.y;
+                    }
+
+                    return pos;
+                })
+            //and only if it passes validation
+            const cValidatedGate = sMovePositionTest
+                .map(pos => validator(displayTarget, pos))
+                .hold(false);
+            const sMovePosition = sMovePositionTest.gate(cValidatedGate);
+
+            //assignments for external and internal use
             this.sStart = sTouchStart.map(evt => displayTarget);
             this.sMove = sMovePosition.map(p => new Tuple2<PIXI.DisplayObject, PIXI.Point>(displayTarget, p));
             this.sEnd = sTouchEnd.map(evt => displayTarget);
@@ -61,19 +97,21 @@ export class Draggable {
             //frp listeners
             this.unlisteners.push(
                 //use named functions so we can remove them
-                sTouchStart.listen(evt => {
+                this.sStart.listen(d => {
                     Main.app.renderer.plugins.interaction.on('pointermove', this.dispatchMove);
                     Main.app.renderer.plugins.interaction.on('pointerup', this.dispatchEnd);
                     Main.app.renderer.plugins.interaction.on('pointeroutside', this.dispatchEnd);
                 }),
-                sTouchEnd.listen(evt => {
+                this.sEnd.listen(d => {
                     Main.app.renderer.plugins.interaction.off('pointermove', this.dispatchMove);
                     Main.app.renderer.plugins.interaction.off('pointerup', this.dispatchEnd);
                     Main.app.renderer.plugins.interaction.off('pointeroutside', this.dispatchEnd);
                 }),
 
                 //move it!
-                sMovePosition.listen(pos => displayTarget.position.set(pos.x, pos.y)),
+                this.sMove.listen(t => {
+                    t.a.position.set(t.b.x, t.b.y)
+                }),
             );
         });
     }
@@ -86,5 +124,27 @@ export class Draggable {
         Main.app.renderer.plugins.interaction.off('pointermove', this.dispatchMove);
         Main.app.renderer.plugins.interaction.off('pointerup', this.dispatchEnd);
         Main.app.renderer.plugins.interaction.off('pointeroutside', this.dispatchEnd);
+    }
+}
+
+
+
+export function HorizontalValidator(xMin:number, xMax:number): DraggableValidator {
+    return function(displayTarget: PIXI.DisplayObject, point:PIXI.Point) {
+        return (point.x >= xMin && point.x <= xMax) ? true : false;
+    }
+}
+
+export function VerticalValidator(yMin:number, yMax:number): DraggableValidator {
+    return function(displayTarget: PIXI.DisplayObject, point:PIXI.Point) {
+        return (point.y >= yMin && point.y <= yMax) ? true : false;
+    }
+}
+
+export function RectValidator(rect:PIXI.Rectangle): DraggableValidator {
+    return function(displayTarget: PIXI.DisplayObject, point:PIXI.Point) {
+        const hValidator = HorizontalValidator(rect.x, rect.x + rect.width);
+        const vValidator = VerticalValidator(rect.y, rect.y + rect.height);
+        return (hValidator(displayTarget, point) && vValidator(displayTarget, point));
     }
 }

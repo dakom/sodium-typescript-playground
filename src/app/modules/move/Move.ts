@@ -2,7 +2,7 @@ import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink, Tuple2, lamb
 import { BaseContainer } from "../../../lib/display/BaseContainer";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
-import {Draggable} from "../../../lib/draggable/Draggable";
+import {Draggable, HorizontalValidator, VerticalValidator, RectValidator} from "../../../lib/draggable/Draggable";
 import { Shape, CreateShapes } from "./Move_UI";
 
 
@@ -26,14 +26,12 @@ export class Move extends BaseContainer {
         //combine all drag starts into one stream
         const sTouchStart = draggables
                 .map(drag => drag.sStart)
-                .reduce((acc: Stream<PIXI.DisplayObject>, elem: Stream<PIXI.DisplayObject>) => acc.orElse(elem),
-                new Stream<PIXI.DisplayObject>());
+                .reduce((acc: Stream<PIXI.DisplayObject>, elem: Stream<PIXI.DisplayObject>) => acc.orElse(elem));
 
         //combine all drag ends into one stream
         const sTouchEnd = draggables
                 .map(drag => drag.sEnd)
-                .reduce((acc: Stream<PIXI.DisplayObject>, elem: Stream<PIXI.DisplayObject>) => acc.orElse(elem),
-                new Stream<PIXI.DisplayObject>());
+                .reduce((acc: Stream<PIXI.DisplayObject>, elem: Stream<PIXI.DisplayObject>) => acc.orElse(elem));
 
         //listen to updates and change highlight (position updates are handled via Draggable)
         Transaction.run((): void => {

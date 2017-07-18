@@ -40,7 +40,9 @@ export class Menu extends PIXI.Container {
             const buttons = configs.map(config => new MenuButton(this._selectedCell, config));
 
             //merge all the button click streams into one
-            this._sClicked = R.reduce((acc:Stream<string>, elem:Stream<string>) => acc.orElse(elem), new Stream<string>(), buttons.map(button => button.sClicked));
+            this._sClicked = buttons
+                                .map(button => button.sClicked)
+                                .reduce((acc:Stream<string>, elem:Stream<string>) => acc.orElse(elem));
             
             //add capability to force an id to be set from the outside
             this._sForceClicked = new StreamSink<string>();

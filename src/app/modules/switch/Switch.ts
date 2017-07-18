@@ -42,7 +42,7 @@ export class Switch extends BaseContainer {
         const sLoad = this.assets.load(
             this.getCharacters()
                 .map(chr => chr.paths)
-                .reduce((acc: Array<string>, elem: Array<string>) => acc.concat(elem), new Array<string>()))
+                .reduce((acc: Array<string>, elem: Array<string>) => acc.concat(elem)))
 
         
         this.unlisteners.push(sLoad.listen(ready => {

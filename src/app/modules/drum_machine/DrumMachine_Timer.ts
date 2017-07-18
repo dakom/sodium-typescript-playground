@@ -1,6 +1,7 @@
 
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Row_UI, Block_UI} from "./DrumMachine_UI";
+
 import { MillisecondsTimerSystem, Cell, Transaction, CellLoop, CellSink, Stream, StreamSink} from "sodiumjs";
 
 class Block {
@@ -17,14 +18,19 @@ class Block {
 export class Timer extends PIXI.Container {
     private _cMeasure:Cell<number>;
 
+    private _row:Row_UI;
+
     constructor() {
         super();
 
         //visual setup
-        const row = new Row_UI(0xff0000, 0xcccccc);
-        row.x = (CanvasWidth - row.width) / 2;
-        this.addChild(row);
+        this._row = new Row_UI(0xff0000, 0xcccccc);
+        this.addChild(this._row);
 
+        
+    }
+
+    public start(cSpeed:Cell<number>) {
         //timer setup
         const sys = new MillisecondsTimerSystem();
         const period = 200;
@@ -33,6 +39,7 @@ export class Timer extends PIXI.Container {
         const oAlarm = new CellLoop<number>();
         const sAlarm = sys.at(oAlarm);
 
+        //TODO - map period based on cSpeed
         const nextAlarm = sAlarm.map(t => t + period);
         oAlarm.loop(nextAlarm.hold(time.sample() + period)); //time.sample() == Date.now()
 
@@ -48,7 +55,7 @@ export class Timer extends PIXI.Container {
 
         
         //get blocks as frp logic
-        const blocks = row.children
+        const blocks = this._row.children
             .forEach((graphics, index) => 
                 new Block(graphics as Block_UI, cMeasure.map(num => num === index)));
     }

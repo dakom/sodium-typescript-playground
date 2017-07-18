@@ -44,7 +44,6 @@ export class Samplers extends PIXI.Container {
         const rows = new Array<Row>();
         for(let index = 0, offset = 0; index < 4; index++) {
             let row = new Row();
-            row.x = (CanvasWidth - row.width)/2;
             row.y = offset;
             rows.push(row);
             offset += row.height + 10;
