@@ -5,6 +5,7 @@ import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Samplers} from "./DrumMachine_Samplers";
 import {Timer} from "./DrumMachine_Timer";
 
+
 export class DrumMachine extends BaseContainer {
     private unlisteners: Array<() => void>;
 
@@ -22,6 +23,7 @@ export class DrumMachine extends BaseContainer {
         timer.y = samplers.y + samplers.height + 30;
         this.addChild(timer);
 
+        
         Transaction.run((): void => {
             
         });
