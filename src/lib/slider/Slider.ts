@@ -28,7 +28,7 @@ export class Slider extends PIXI.Container {
     private _sForced: StreamSink<PIXI.Point>;
     private _knob:PIXI.DisplayObject;
 
-    constructor(private opts: SliderOptions) {
+    constructor(public readonly opts: SliderOptions) {
         super();
 
         //limits setup

@@ -1,6 +1,5 @@
 
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
-import {PrimitiveFuncs} from "../../../lib/funcs/PrimitiveFuncs";
 import {Row_UI, Block_UI} from "./DrumMachine_UI";
 import { MillisecondsTimerSystem, Cell, Transaction, CellLoop, CellSink, Stream, StreamSink} from "sodiumjs";
 import * as R from "ramda";

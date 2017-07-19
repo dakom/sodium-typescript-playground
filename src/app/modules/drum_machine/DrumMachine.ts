@@ -4,7 +4,7 @@ import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Samplers} from "./DrumMachine_Samplers";
 import {Timer} from "./DrumMachine_Timer";
-import {Slider, Direction} from "../../../lib/slider/Slider";
+import {Slider, Direction, SliderOptions} from "../../../lib/slider/Slider";
 
 
 export class DrumMachine extends BaseContainer {
@@ -26,9 +26,30 @@ export class DrumMachine extends BaseContainer {
         timer.y = samplers.y + samplers.height + 30;
         this.addChild(timer);
 
-        //slider
-        
-        const sliderConfig = {
+        const slider = new Slider(this.getSliderOptions((timer.y + timer.height) - samplers.y));
+        slider.x = samplers.x + samplers.width + 40;
+        slider.y = samplers.y;
+        this.addChild(slider);
+
+        //frp transaction
+        Transaction.run((): void => {
+            //start the timer with a hookup to slider for speed control
+            timer.start(slider.sPerc.hold(slider.opts.initPerc));
+
+            //get the current samples and play
+            this.unlisteners.push(
+                samplers.getSamples(timer.cMeasure).listen(samples => {
+                    samples.forEach(sampleId => {
+                        console.log(sampleId);
+                    });    
+                })
+            );
+                
+        });
+    }
+
+   getSliderOptions(size:number):SliderOptions {
+       return {
             initPerc: .25,
             dir: Direction.VERTICAL,
             knob: {
@@ -37,38 +58,12 @@ export class DrumMachine extends BaseContainer {
             },
             track: {
                 sizeX: 50,
-                sizeY: (timer.y + timer.height) - samplers.y,
+                sizeY: size,
                 color: 0x00ff00
             }
-        };
-        /*
-        const sliderConfig = {
-            initPerc: .25,
-            dir: Direction.VERTICAL,
-            knob: {
-                radius: 25,
-                color: 0xFF0000
-            },
-            track: {
-                sizeX: 300,
-                sizeY: 300,
-                color: 0x00ff00
-            }
-        };
-        */
-        const slider = new Slider(sliderConfig);
-        slider.x = samplers.x + samplers.width + 40;
-        slider.y = samplers.y;
-        this.addChild(slider);
-
-        //frp transaction
-        Transaction.run((): void => {
-            //start the timer, hooking up to slider for perc
-            timer.start(slider.sPerc.hold(sliderConfig.initPerc));
-        });
+        }
     }
 
-   
     dispose() {
         this.unlisteners.forEach(unlistener => unlistener());
    
