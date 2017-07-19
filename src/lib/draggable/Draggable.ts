@@ -55,9 +55,9 @@ export class Draggable {
                 .map(evt => evt === null ? false : true)
                 .hold(false);
 
-            //get the move position, only if we're dragging
-            const sMovePositionTest = sTouchMove
-                .gate(cDraggingGate)
+            //get the move position
+            const sMovePosition = sTouchMove
+                .gate(cDraggingGate) //only if we're dragging
                 .snapshot(cInitPosition, (evt, initPos) => {
                     //map to coordinates based on parent
                     const pos = evt.data.getLocalPosition(displayTarget.parent, undefined, evt.data.global);
@@ -74,12 +74,9 @@ export class Draggable {
 
                     return pos;
                 })
-            //and only if it passes validation
-            const cValidatedGate = sMovePositionTest
-                .map(pos => validator(displayTarget, pos))
-                .hold(false);
-            const sMovePosition = sMovePositionTest.gate(cValidatedGate);
-
+                .map(pos => validator(displayTarget, pos) ? pos : null) //only if it's validated
+                .filterNotNull();
+            
             //assignments for external and internal use
             this.sStart = sTouchStart.map(evt => displayTarget);
             this.sMove = sMovePosition.map(p => new Tuple2<PIXI.DisplayObject, PIXI.Point>(displayTarget, p));
