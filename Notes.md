@@ -169,10 +169,13 @@ Transaction.run((): void => {
 });
 ```
 
-## Hold is implicitly delayed till the end of a transaction
+## Implicit delay
 
-This is a gotcha than can cause some headache when relying on cells for gate() for example.
+The docs state that Sodium’s hold has an implicit delay. In other words, stream updates will only see the values as updated in the previous transaction.
+
+This is a gotcha that needs consideration when relying on cells for gate() for example.
 
 See [this test](src/tests/sodium/gate/GateTest.ts) where `filter` gets the correct value, but `gate` is getting the stale value
 
-This _might_ be the reason that gate isn't used as much as stream.filter() in the book and sample code (however gate can still be plenty useful!)
+For the most part, however, I'm finding that it typically doesn't make much of a difference in the logic... since things flow declaratively, and frp is built to deal with the problem of events coming from anywhere, it's _usually_ a non-issue on a practical level, but still important to keep in mind.
+
