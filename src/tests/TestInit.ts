@@ -1,4 +1,5 @@
 
+import {SodiumTests} from "./sodium/SodiumTests";
 import { expect } from 'chai';
 
 class TesterInit {
@@ -9,6 +10,8 @@ class TesterInit {
                 expect(1+1).to.equal(2);
             });
        });
+
+       new SodiumTests();
     }
 }
 

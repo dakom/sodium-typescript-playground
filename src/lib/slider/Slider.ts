@@ -1,5 +1,6 @@
 import { Transaction, StreamSink, Stream, Cell, Tuple2 } from "sodiumjs";
-import { Draggable, HorizontalValidator, VerticalValidator, DraggableAxisLock } from "../draggable/Draggable";
+import { Draggable, DraggableAxisLock } from "../draggable/Draggable";
+import {HorizontalValidator, VerticalValidator} from "../draggable/Draggable_Validator"
 import * as R from "ramda";
 
 export enum Direction {
@@ -34,7 +35,8 @@ export class Slider extends PIXI.Container {
         const min = opts.knob.radius;
         const max = (opts.dir === Direction.HORIZONTAL) ? (opts.track.sizeX - opts.knob.radius) : (opts.track.sizeY - opts.knob.radius);
         
-        //utility function
+        
+        //utility functions
         function getPerc(pos:number):number {
             const clamp = R.clamp(0,1);
             const p = (pos - min) / (max - min);

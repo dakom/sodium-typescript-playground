@@ -2,7 +2,7 @@ import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink, Tuple2, lamb
 import { BaseContainer } from "../../../lib/display/BaseContainer";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
-import {Draggable, HorizontalValidator, VerticalValidator, RectValidator} from "../../../lib/draggable/Draggable";
+import {Draggable} from "../../../lib/draggable/Draggable";
 import { Shape, CreateShapes } from "./Move_UI";
 
 

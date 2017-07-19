@@ -169,3 +169,8 @@ Transaction.run((): void => {
 });
 ```
 
+## hold is at the end of a transaction
+
+This is a gotcha than can cause some headache when relying on cells for gate() for example.
+
+See [this test](src/tests/sodium/gate/GateTest.ts) where `filter` gets the correct value, but `gate` is getting the stale value

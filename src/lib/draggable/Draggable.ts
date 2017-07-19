@@ -1,5 +1,6 @@
 import { Transaction, StreamSink, Stream, Cell, Tuple2 } from "sodiumjs";
 import { Main } from "../../app/main/Main";
+import { DraggableValidator } from "./Draggable_Validator";
 
 export enum DraggableAxisLock {
     NONE,
@@ -7,9 +8,7 @@ export enum DraggableAxisLock {
     Y,
     BOTH
 }
-export interface DraggableValidator {
-    (displayTarget: PIXI.DisplayObject, point:PIXI.Point): boolean;
-}
+
 
 export class Draggable {
     //streams for listening externally
@@ -103,6 +102,7 @@ export class Draggable {
                     Main.app.renderer.plugins.interaction.on('pointeroutside', this.dispatchEnd);
                 }),
                 this.sEnd.listen(d => {
+                    
                     Main.app.renderer.plugins.interaction.off('pointermove', this.dispatchMove);
                     Main.app.renderer.plugins.interaction.off('pointerup', this.dispatchEnd);
                     Main.app.renderer.plugins.interaction.off('pointeroutside', this.dispatchEnd);
@@ -129,22 +129,3 @@ export class Draggable {
 
 
 
-export function HorizontalValidator(xMin:number, xMax:number): DraggableValidator {
-    return function(displayTarget: PIXI.DisplayObject, point:PIXI.Point) {
-        return (point.x >= xMin && point.x <= xMax) ? true : false;
-    }
-}
-
-export function VerticalValidator(yMin:number, yMax:number): DraggableValidator {
-    return function(displayTarget: PIXI.DisplayObject, point:PIXI.Point) {
-        return (point.y >= yMin && point.y <= yMax) ? true : false;
-    }
-}
-
-export function RectValidator(rect:PIXI.Rectangle): DraggableValidator {
-    return function(displayTarget: PIXI.DisplayObject, point:PIXI.Point) {
-        const hValidator = HorizontalValidator(rect.x, rect.x + rect.width);
-        const vValidator = VerticalValidator(rect.y, rect.y + rect.height);
-        return (hValidator(displayTarget, point) && vValidator(displayTarget, point));
-    }
-}
