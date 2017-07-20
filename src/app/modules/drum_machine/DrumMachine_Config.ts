@@ -11,7 +11,7 @@ export function RowConfig(rowIndex: number): Array<number> {
         case 2: //cymbal
             return [];
         case 3: //hihat
-            return [2,7,12];
+            return [2,7,9,12];
 
     }
     return [];

@@ -16,9 +16,7 @@ export function accPropsLeadingZero(prop: string, vals: Array<any>): Array<numbe
 
 //sequence() for sodium cells
 export function CellSequence<A>(cells: Array<Cell<A>>): Cell<Array<A>> {
-    let out = new Cell(new Array<A>());
-    for (let cell of cells) {
-        out = out.lift(cell, (list, a) => list.concat(a));
-    }
-    return out;
+    return cells.reduce((out, cell) => 
+            out = out.lift(cell, (list, a) => list.concat([a])), 
+            new Cell(new Array<A>()));
 }
