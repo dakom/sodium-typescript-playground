@@ -4,6 +4,8 @@
 
 [Live demo here](https://dakom.github.io/sodium-typescript-playground)
 
+_See description of the modules below for how to use the demo_
+
 This is my testing repo for learning and kicking the tires around [sodium-typescript](https://github.com/SodiumFRP/sodium-typescript). There may be purposefully broken code and some modules might disappear or be replaced over time... but feel free to clone and tinker or whatever!
 
 I'm keeping some loose [Architectural / learning notes](Notes.md) for reference. In there you'll find some generic points as well as specifics on how to use the different primitives. If, like me, you're new to frp and are hitting some gotchas, I'd suggest giving those a glance.
@@ -27,6 +29,8 @@ Give it a try and you might have the same experience :)
 The meat of the code is generally in [src/app/modules](src/app/modules)
 
 There are some comments written in key sections, though maybe one of these days I'll go through and sprinkle in some more...
+
+Keep in mind for each module that it may need to load some remote media, and there's no preloader... so if nothing's on the screen give it a couple seconds (except for draw - just try touching the screen, it'll start working when the brush is loaded)
 
 As of right now, here's what the different modules are for:
 
