@@ -6,7 +6,7 @@
 
 _See description of the modules below for how to use the demo_
 
-This is my testing repo for learning and kicking the tires around [sodium-typescript](https://github.com/SodiumFRP/sodium-typescript) and integrating it with [PIXI](http://www.pixijs.com/). There may be purposefully broken code and some modules might disappear or be replaced over time... but feel free to clone and tinker or whatever!
+This began as my testing repo for learning and kicking the tires around [sodium-typescript](https://github.com/SodiumFRP/sodium-typescript) and integrating it with [PIXI](http://www.pixijs.com/). Now it's evolved into a stable demo... feel free to clone and tinker!
 
 I'm keeping some loose [Architectural / learning notes](Notes.md) for reference. In there you'll find some generic points as well as specifics on how to use the different primitives. If, like me, you're new to frp and are hitting some gotchas, I'd suggest giving those a glance.
 
