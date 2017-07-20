@@ -65,7 +65,7 @@ export class Bunnies extends BaseContainer {
         unlisteners.push(
             sCreating.listen(() => {
                 for (let i = 0; i < 100; i++) {
-                    let bunny = new Bunny(this.ui.texture);
+                    const bunny = new Bunny(this.ui.texture);
                     bunnyContainer.addChild(bunny);
                     bunnies.push(bunny);
                 }

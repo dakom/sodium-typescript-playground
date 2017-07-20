@@ -8,7 +8,7 @@ export class Path {
     static get audioExt(): string {
         if (this._audioExt === undefined) {
 
-            let Modernizr: any = (window as any).Modernizr;
+            const Modernizr: any = (window as any).Modernizr;
 
             if (Modernizr.audio.mp3 == "probably") {
                 this._audioExt = '.mp3';
@@ -30,7 +30,7 @@ export class Path {
     static get videoExt(): string {
         if (this._videoExt === undefined) {
 
-            let Modernizr: any = (window as any).Modernizr;
+            const Modernizr: any = (window as any).Modernizr;
             if (Modernizr.video.h264 == "probably") {
                 this._videoExt = '.mp4';
             } else if (Modernizr.video.webm == "probably") {

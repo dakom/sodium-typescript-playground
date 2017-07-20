@@ -12,9 +12,9 @@ export class UI {
     }
 
     load():Cell<boolean> {
-        let cLoad = new CellSink<boolean>(false);
+        const cLoad = new CellSink<boolean>(false);
 
-        let loader = new PIXI.loaders.Loader();
+        const loader = new PIXI.loaders.Loader();
 
         loader.add("bunny", Path.GetImagePath("bunny.png"));
         loader.once("complete", () => {

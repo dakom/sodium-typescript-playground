@@ -9,7 +9,7 @@ export class Assets {
     }
 
     load():Stream<boolean> {
-        let loader = new PIXI.loaders.Loader();
+        const loader = new PIXI.loaders.Loader();
 
         const sLoad = new StreamSink<boolean>();
         loader.add("brush", Path.GetImagePath("brush.png"));

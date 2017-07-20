@@ -11,7 +11,7 @@ export class Assets {
 
     load(ids:Array<string>):Stream<boolean> {
        
-        let loader = new PIXI.loaders.Loader();
+        const loader = new PIXI.loaders.Loader();
 
         const sLoad = new StreamSink<boolean>();
         ids.forEach(id => loader.add(id, Path.GetImagePath(id) + ".png"));
@@ -30,10 +30,7 @@ export class Assets {
 
     dispose():void {
         Object.keys(this.loader.resources)
-            .forEach(key => {
-                let texture = this.loader.resources[key].texture;
-                texture.destroy();
-            });
+            .forEach(key => this.loader.resources[key].texture.destroy());
         this.loader.reset();
     }
 }

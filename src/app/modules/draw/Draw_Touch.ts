@@ -30,7 +30,7 @@ export class TouchManager {
         function updateRawTouch(touchType: TouchType, evt: PIXI.interaction.InteractionEvent) {
             //this is pure, but not as performant... to increase performance we could pass a point
             //in casual tests though, it's a non-issue
-            let touchPoint = evt.data.getLocalPosition(evt.currentTarget, undefined, evt.data.global);
+            const touchPoint = evt.data.getLocalPosition(evt.currentTarget, undefined, evt.data.global);
             sRawTouch.send({
                 type: touchType,
                 point: {
@@ -44,7 +44,7 @@ export class TouchManager {
         //in other words this is a sort of state machine implemented in frp
         this._sTouch = sRawTouch.collect(TouchType.WAIT, (touchInfo, state) => {
             //copy the object, for the sake of purity
-            let updatedInfo = {
+            const updatedInfo = {
                     type: this.validate(state, touchInfo) ? touchInfo.type : TouchType.WAIT,
                     point: {
                         x: touchInfo.point.x,

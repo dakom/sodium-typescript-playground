@@ -64,6 +64,16 @@ Sortof a culmination of all the previous modules, and some new stuff too.
 
 The cool thing here is, again, when it comes down to it the core logic is tight and easy to reason about
 
+# Future
+
+There's a few areas that could probably be improved:
+
+1. Some snippets could probably be made a bit tighter with more familiarity of Ramda. That said, I did use it and some fp approaches in key places (e.g. repetitive layout things) and there's frequent use of js native map/reduce.
+
+2. Pretty much every class is sandwiched with side effects (I tried to “push those to the edges” as much as possible, without clutter- see [learning notes](Notes.md) for more detail on that). This is unavoidable, but something is still bothering me that the whole flow kicks off with a sortof ugly listen() sandwhich... please ignore AppInit.ts for now :P. On the plus side, however, this "restriction" disallowed using send() immediately which seriously forced a far more declarative way of thinking and tying things together. A blessing in disguise, maybe, but it could be prettier ;)
+
+3. Similarly, most of the logic for each class is in its constructor and there's no need to store class members for those. Except when they need to be disposed, so there's sometimes a bit of duplication/assignment just for housekeeping. I haven't figured out a better solution yet but my gut feeling is that it's room for improvement
+
 ----
 
 # Misc

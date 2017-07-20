@@ -65,5 +65,5 @@ topMenu.sClicked.listen(id => {
 
 });
 
-//just for testing
-topMenu.forceId("drum_machine");
+//starting off...
+topMenu.forceId("simple");

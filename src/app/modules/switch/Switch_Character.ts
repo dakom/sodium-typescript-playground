@@ -16,6 +16,7 @@ export class Character  {
 
     constructor(public readonly config:CharacterConfig) {
 
+        //this could probably be done nicer with some ramda call...
         this._paths = new Array<string>();
         for (let i = 1; i < config.len; i++) {
             this._paths.push(this.getPath(i));
@@ -49,6 +50,7 @@ export class Character  {
        this.frames.stop();
     }
     public prepAssets(assets: Assets) {
+        //this could probably be done nicer with some ramda call...
         this._textures = new Array<PIXI.Texture>();
         for (let i = 1; i < this.config.len; i++) {
             this._textures.push(assets.getTexture(this.getPath(i)))

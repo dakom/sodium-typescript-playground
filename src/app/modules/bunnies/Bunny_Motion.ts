@@ -12,7 +12,7 @@ const GRAVITY = 0.75;
 
 //update the motion - explicitly copying and freezing to ensure immutability here
 export function UpdateMotion(_motion: Motion, bounds: PIXI.Rectangle): Motion {
-    let motion = {
+    const motion = {
         origin: Object.assign({}, _motion.origin),
         direction: Object.assign({}, _motion.direction)
     }

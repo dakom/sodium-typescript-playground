@@ -22,9 +22,9 @@ export class Brush {
     public getSprites(len: number): Array<PIXI.Sprite> {
         //need to grow the pool first...
         if (this.pool.length < len) {
-            let amount: number = len - this.pool.length;
+            const amount: number = len - this.pool.length;
             for (let i = 0; i < amount; i++) {           
-                let sprite: PIXI.Sprite = new PIXI.Sprite(this.texture);
+                const sprite: PIXI.Sprite = new PIXI.Sprite(this.texture);
                 sprite.anchor.set(.5, .5);
                 sprite.tint = this._color;
                 this.pool.push(sprite);

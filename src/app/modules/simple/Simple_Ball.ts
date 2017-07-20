@@ -23,8 +23,8 @@ export class Ball extends BaseContainer {
 
 
         Transaction.run((): void => {
-            let cMotion = new CellLoop<Motion>();
-            let sUpdate = sTicks.snapshot(cMotion, (dt, motion) => this.getMotion(dt, motion));
+            const cMotion = new CellLoop<Motion>();
+            const sUpdate = sTicks.snapshot(cMotion, (dt, motion) => this.getMotion(dt, motion));
             cMotion.loop(sUpdate.hold({
                 x: 0,
                 v: SPEED
@@ -34,10 +34,10 @@ export class Ball extends BaseContainer {
     }
 
     getMotion(dt:number, _motion:Motion):Motion {
-        let xMin = RADIUS;
-        let xMax = CanvasWidth - RADIUS;
-        let xUpdate = R.clamp(xMin, xMax, _motion.x + dt * _motion.v);
-        let motion = R.set(R.lensProp("x"), xUpdate, _motion);
+        const xMin = RADIUS;
+        const xMax = CanvasWidth - RADIUS;
+        const xUpdate = R.clamp(xMin, xMax, _motion.x + dt * _motion.v);
+        const motion = R.set(R.lensProp("x"), xUpdate, _motion);
         
         if(motion.x == xMin || motion.x == xMax) {
             motion.v *= -1;

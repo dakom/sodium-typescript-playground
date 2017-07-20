@@ -6,7 +6,7 @@ export class Assets {
     private loader:PIXI.loaders.Loader;
     
     load(sampleIds:Array<string>):Stream<PIXI.loaders.ResourceDictionary> {
-        let loader = new PIXI.loaders.Loader();
+        const loader = new PIXI.loaders.Loader();
 
         const sLoad = new StreamSink<PIXI.loaders.ResourceDictionary>();
         sampleIds.forEach(sampleId => loader.add(sampleId, Path.GetAudioPath(sampleId + `.wav`)));

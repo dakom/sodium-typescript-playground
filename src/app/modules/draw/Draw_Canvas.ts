@@ -32,14 +32,14 @@ export class Canvas extends PIXI.Sprite {
     }
 
     drawLine(p1:Point, p2:Point) {
-        let points: Array<number> = this.getLine(p1.x, p1.y, p2.x, p2.y);
+        const points: Array<number> = this.getLine(p1.x, p1.y, p2.x, p2.y);
         if (points.length == 0) {
             return;
         }
 
-        let sprites: Array<PIXI.Sprite> = this.brush.getSprites(points.length / 2);
+        const sprites: Array<PIXI.Sprite> = this.brush.getSprites(points.length / 2);
         for (let pointIndex = 0, spriteIndex = 0; pointIndex < points.length;) {
-            let sprite = sprites[spriteIndex++];
+            const sprite = sprites[spriteIndex++];
             sprite.position.set(points[pointIndex++], points[pointIndex++]);
             this.drawBuffer.addChild(sprite);
         }
