@@ -2,7 +2,7 @@ import * as R from "ramda";
 import { Cell } from "sodiumjs";
 
 //accumulates object[measureProp] and spaces them by padding
-//useful for layout
+//used in this app for layout - both across the horizontal and vertical axis (see menu or drum machine)
 export function spreadPosition(padding:number, measureProp:string, objects:any):Array<number> {
     const measures = R.pluck(measureProp, objects);
 

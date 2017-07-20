@@ -45,9 +45,9 @@ export class Bunnies extends BaseContainer {
         this.ui = ui;
 
         //logic
+        //note that in this example we're using a gate() to control the load-ready status rather than a listener
         const cTouch = new CellSink<TOUCH>(TOUCH.UP); //
         const cLoad = ui.load(); //load ui assets
-
         const sReady = ticker.sTicks.gate(cLoad); //prevent anything from happening until ui is loaded
         const sCreating = sReady.gate(cTouch.map(t => t == TOUCH.DOWN ? true : false)); //don't make bunnies unless mouse is down
 

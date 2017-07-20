@@ -26,6 +26,8 @@ Give it a try and you might have the same experience :)
 
 The meat of the code is generally in [src/app/modules](src/app/modules)
 
+There are some comments written in key sections, though maybe one of these days I'll go through and sprinkle in some more...
+
 As of right now, here's what the different modules are for:
 
 ## Simple
@@ -56,17 +58,13 @@ Drawing via PIXI rendertexture. This is an example of separating not just frp vs
 
 Moving different items around where state is handled by the parent container (allowing for setting the other inactive items as well)
 
-## Move + Draw (todo)
+## Drum Machine
 
-Combinding move and draw
+Sortof a culmination of all the previous modules, and some new stuff too.
 
-# Future
+The cool thing here is, again, when it comes down to it the core logic is tight and easy to reason about
 
 ----
-
-There are some more simple modules I'd like to add that would be nice illustrations of how to use frp... not sure if I'll get to them
-
-* Drum Machine / Sequencer (ticker driven by stream, samples driven by cells)
 
 # Misc
 

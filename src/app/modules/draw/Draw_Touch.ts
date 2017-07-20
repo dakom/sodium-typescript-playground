@@ -28,6 +28,8 @@ export class TouchManager {
         target.on('pointerupoutside', evt => updateRawTouch(TouchType.END, evt));
 
         function updateRawTouch(touchType: TouchType, evt: PIXI.interaction.InteractionEvent) {
+            //this is pure, but not as performant... to increase performance we could pass a point
+            //in casual tests though, it's a non-issue
             let touchPoint = evt.data.getLocalPosition(evt.currentTarget, undefined, evt.data.global);
             sRawTouch.send({
                 type: touchType,
@@ -40,7 +42,6 @@ export class TouchManager {
 
         //validate rawTouch. The validation function gets the oldState via collect()
         //in other words this is a sort of state machine implemented in frp
-        //ultimately, it filters out WAIT events
         this._sTouch = sRawTouch.collect(TouchType.WAIT, (touchInfo, state) => {
             //copy the object, for the sake of purity
             let updatedInfo = {
