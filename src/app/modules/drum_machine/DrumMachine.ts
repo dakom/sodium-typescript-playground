@@ -13,6 +13,7 @@ import * as R from "ramda";
 interface Sound {
     volume:number;
     play: () => void;
+    destroy: () => void;
 }
 interface SoundLookup {
     [sampleId:string]: Sound;
@@ -21,7 +22,7 @@ interface SoundLookup {
 export class DrumMachine extends BaseContainer {
     private unlisteners: Array<() => void>;
     private assets: Assets;
-
+   
     constructor() {
         super();
 
@@ -88,5 +89,6 @@ export class DrumMachine extends BaseContainer {
     dispose() {
         this.unlisteners.forEach(unlistener => unlistener());
         this.assets.dispose();
+        (window as any).PIXI.sound.removeAll();
     }
 }

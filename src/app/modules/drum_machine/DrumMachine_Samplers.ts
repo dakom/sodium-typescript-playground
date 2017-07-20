@@ -1,7 +1,8 @@
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
+import { BaseContainer } from "../../../lib/display/BaseContainer";
 import { Row_UI, Block_UI } from "./DrumMachine_UI";
 import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink } from "sodiumjs";
-import { CellSequence } from "../../../lib/funcs/PrimitiveFuncs";
+import { CellSequence, spreadPosition } from "../../../lib/funcs/PrimitiveFuncs";
 import {RowConfig} from "./DrumMachine_Config";
 import * as R from "ramda";
 
@@ -45,7 +46,7 @@ class Row extends PIXI.Container {
     }
 }
 
-export class Samplers extends PIXI.Container {
+export class Samplers extends BaseContainer {
     private rows: Array<Row>;
 
     constructor(sampleIds:Array<string>) {
@@ -64,18 +65,21 @@ export class Samplers extends PIXI.Container {
                 )
             )
         )
-            .map(sampleIds => sampleIds.filter(sample => sample !== ""));
+        .map(sampleIds => sampleIds.filter(sample => sample !== ""));
     }
 
 
     makeRows(sampleIds): Array<Row> {
-        let offset = 0;
-        return sampleIds.map((sound, index) => {
-            let row = new Row(sound, RowConfig(index));
-            row.y = offset;
-            offset += row.height + 10;
-            return row;
-        });
+        const rows = sampleIds.map((sound, index) => new Row(sound, RowConfig(index)));
+        const positions = spreadPosition(10, "height", rows);
+        R.zipWith((ref, y) => ref.y = y, rows, positions);
+
+        return rows;
+    }
+
+    dispose() {
+        this.rows.forEach(row => 
+            row.blocks.forEach(block => block.dispose()));
     }
 
 }

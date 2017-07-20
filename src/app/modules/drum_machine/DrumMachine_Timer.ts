@@ -1,11 +1,11 @@
-
+import { BaseContainer } from "../../../lib/display/BaseContainer";
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Row_UI, Block_UI} from "./DrumMachine_UI";
 import { MillisecondsTimerSystem, Cell, Transaction, CellLoop, CellSink, Stream, StreamSink} from "sodiumjs";
 import * as R from "ramda";
 
-export class Timer extends PIXI.Container {
-    public dispose:() => void;
+export class Timer extends BaseContainer {
+    public unlisten:() => void;
 
     private _cMeasure:Cell<number>;
     private _row:Row_UI;
@@ -44,7 +44,7 @@ export class Timer extends PIXI.Container {
         this._cMeasure = cMeasure;
 
         //visual updates when measure changes
-        this.dispose = this._cMeasure.listen(measure => {
+        this.unlisten = this._cMeasure.listen(measure => {
             this._row.children
                 .forEach((block, index) => (block as Block_UI).redraw(measure === index));
         })
@@ -52,6 +52,10 @@ export class Timer extends PIXI.Container {
 
     public get cMeasure():Cell<number> {
         return this._cMeasure;
+    }
+
+    dispose() {
+        this.unlisten();
     }
 
 }
