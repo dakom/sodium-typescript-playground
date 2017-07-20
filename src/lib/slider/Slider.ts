@@ -24,6 +24,7 @@ export interface SliderOptions {
 
 export class Slider extends PIXI.Container {
     public sPerc: Stream<number>
+    public cPerc: Cell<number>
 
     private _sForced: StreamSink<PIXI.Point>;
     private _knob:PIXI.DisplayObject;
@@ -76,7 +77,9 @@ export class Slider extends PIXI.Container {
 
             //set perc stream for reading
             this.sPerc = kDrag.sMove
-                            .map(t => getPerc((opts.dir === Direction.HORIZONTAL) ? t.b.x : t.b.y))
+                            .map(t => getPerc((opts.dir === Direction.HORIZONTAL) ? t.b.x : t.b.y));
+                            
+            this.cPerc = this.sPerc.hold(opts.initPerc);
         });
     }
 }

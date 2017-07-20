@@ -1,18 +1,15 @@
 import * as R from "ramda";
 import { Cell } from "sodiumjs";
 
-//takes a padding and a list of numbers
-//adds the padding into them sequentially increasing to give it space
-export function addPadding(pad: number, vals: Array<number>): Array<number> {
+//accumulates object[measureProp] and spaces them by padding
+//useful for layout
+export function spreadPosition(padding:number, measureProp:string, objects:any):Array<number> {
+    const measures = R.pluck(measureProp, objects);
 
-    let mapIndexed = R.addIndex(R.map);
-    return mapIndexed((val, idx) => val + (idx * pad), vals);
+    return R.scan(R.add,0,measures)
+            .map((val, idx) => val + (idx * padding));
 }
 
-//accumulates the total of property prop in all the vals - with a leading zero
-export function accPropsLeadingZero(prop: string, vals: Array<any>): Array<number> {
-    return R.scan(R.add, 0, R.pluck(prop, vals));
-}
 
 //sequence() for sodium cells
 export function CellSequence<A>(cells: Array<Cell<A>>): Cell<Array<A>> {

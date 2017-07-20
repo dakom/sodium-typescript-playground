@@ -1,15 +1,15 @@
+import { spreadPosition} from "../../../lib/funcs/PrimitiveFuncs";
+import * as R from "ramda";
 
 export class Row_UI extends PIXI.Container {
     constructor(onColor: number, offColor: number) {
         super();
+        const blocks = R.repeat(null, 16).map(() => new Block_UI(onColor, offColor));
 
-        for(let i = 0, offset = 0; i < 16; i++) {
-            let block = new Block_UI(onColor, offColor);
-            block.x = offset;
-            
-            this.addChild(block);
-            offset += block.width + 10;
-        }
+        const positions = spreadPosition(10, "width", blocks);
+        R.zipWith((ref, x) => ref.x = x, blocks, positions);
+
+        blocks.forEach(block => this.addChild(block))
     }
 }
 

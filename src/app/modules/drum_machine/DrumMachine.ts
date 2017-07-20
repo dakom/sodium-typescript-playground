@@ -5,16 +5,16 @@ import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Samplers } from "./DrumMachine_Samplers";
 import { Timer } from "./DrumMachine_Timer";
 import { Assets } from "./DrumMachine_Assets";
-import {sampleIds, startSpeed} from "./DrumMachine_Config";
+import {sampleIds, VolumeSliderOptions, SpeedSliderOptions} from "./DrumMachine_Config";
 import { Slider, Direction, SliderOptions } from "../../../lib/slider/Slider";
-
+import * as R from "ramda";
 
 
 interface Sound {
     volume:number;
     play: () => void;
 }
-interface Sounds {
+interface SoundLookup {
     [sampleId:string]: Sound;
 }
 
@@ -32,15 +32,17 @@ export class DrumMachine extends BaseContainer {
         sLoad.listen(resources => {
             
             //assign sounds from loaded assets
-            const sounds:Sounds = sampleIds.reduce((all:any, val:string) => {
+            const soundLookup:SoundLookup = sampleIds.reduce((all:any, val:string) => {
                 all[val] = resources[val]["sound"];
                 return all;
             }, {});
+            //we don't want to rely on es7 object.values yet...
+            const soundList = Object.keys(soundLookup).map(key => soundLookup[key] as Sound);
 
             //ui and container setup
             const samplers = new Samplers(sampleIds);
             samplers.x = (CanvasWidth - samplers.width) / 2;
-            samplers.y = (CanvasHeight - samplers.height) / 2;
+            samplers.y = ((CanvasHeight - samplers.height) / 2) - 100;
             this.addChild(samplers);
 
             const timer = new Timer();
@@ -48,21 +50,31 @@ export class DrumMachine extends BaseContainer {
             timer.y = samplers.y + samplers.height + 30;
             this.addChild(timer);
 
-            const slider = new Slider(this.getSliderOptions((timer.y + timer.height) - samplers.y));
-            slider.x = samplers.x + samplers.width + 40;
-            slider.y = samplers.y;
-            this.addChild(slider);
+            const volumeSlider = new Slider(VolumeSliderOptions((timer.y + timer.height) - samplers.y));
+            volumeSlider.x = samplers.x + samplers.width + 40;
+            volumeSlider.y = samplers.y;
+            this.addChild(volumeSlider);
 
+            const speedSlider = new Slider(SpeedSliderOptions(samplers.width));
+            speedSlider.x = samplers.x;
+            speedSlider.y = timer.y + timer.height + 40;
+            this.addChild(speedSlider);
+
+            
             //frp transaction
             Transaction.run((): void => {
                 //start the timer with a hookup to slider for speed control
-                timer.start(slider.sPerc.hold(slider.opts.initPerc));
+                timer.start(speedSlider.cPerc);
 
                 //get the current samples and play
                 this.unlisteners.push(
+                    volumeSlider.cPerc.listen(perc => {
+                        soundList.forEach(sound => sound.volume = perc);
+                    }),
+
                     samplers.getSamples(timer.cMeasure).listen(samples => {
                         samples.forEach(sampleId => {
-                            sounds[sampleId].play();
+                            soundLookup[sampleId].play();
                         });
                     })
                 );
@@ -71,21 +83,7 @@ export class DrumMachine extends BaseContainer {
         });
     }
 
-    getSliderOptions(size: number): SliderOptions {
-        return {
-            initPerc: startSpeed,
-            dir: Direction.VERTICAL,
-            knob: {
-                radius: 25,
-                color: 0xFF0000
-            },
-            track: {
-                sizeX: 50,
-                sizeY: size,
-                color: 0x00ff00
-            }
-        }
-    }
+    
 
     dispose() {
         this.unlisteners.forEach(unlistener => unlistener());

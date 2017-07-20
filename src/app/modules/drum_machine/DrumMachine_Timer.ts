@@ -20,7 +20,7 @@ export class Timer extends PIXI.Container {
 
     public start(cSpeed:Cell<number>) {
         //just tinkered till it felt okay
-        const getSpeed = (speedFactor:number) => R.clamp(50,1000,(Math.pow((1-speedFactor),3)) * 1000);
+        const getSpeed = (speedFactor:number) => R.clamp(20,1000,Math.exp(speedFactor * -5) * 1000);
 
         //timer setup
         const sys = new MillisecondsTimerSystem();

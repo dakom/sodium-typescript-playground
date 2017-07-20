@@ -38,8 +38,9 @@ export class TouchManager {
             });
         }
 
-        //filter internally with a sort of state machine, before sending out
-        //essentially, WAIT means null
+        //validate rawTouch. The validation function gets the oldState via collect()
+        //in other words this is a sort of state machine implemented in frp
+        //ultimately, it filters out WAIT events
         this._sTouch = sRawTouch.collect(TouchType.WAIT, (touchInfo, state) => {
             //copy the object, for the sake of purity
             let updatedInfo = {
