@@ -9,6 +9,10 @@ export enum DraggableAxisLock {
     BOTH
 }
 
+/*
+    Note - right now, inside the class, things are pure... however if performance is an issue, 
+    one easy cheat/remedy is to pass a private point to getLocalPosition() instead of undefined
+*/
 
 export class Draggable {
     //streams for listening externally
