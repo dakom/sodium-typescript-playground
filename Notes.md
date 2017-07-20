@@ -70,9 +70,20 @@ export class (with _simple_ inheritence - e.g. a base class that automatically c
 
 Since this is still early on and I haven't built a large-scale application with this approach yet, it might need adaptation- but it's working so far :D
 
-# Listen
+## Variable types
 
-## Listen is the end - and it's really for side-effects
+In general - almost all variables are const. When they aren't, they're almost always private to the containing class or closure. When they aren't, they're almost always readonly.
+
+There are very, _very_ few cases of real exposed mutable variables, and these are very much on purpose and only used at the beginning/end of the burrito for intentional performance-optimizing or unavoidable side-effects.
+
+It would be nice if there were some sort of linter or detection capability to warn when this isn't the case, but for now it's all manual.
+
+
+# Primitives
+
+## Listen
+
+### Listen is the end - and it's really for side-effects
 
 This is a major paradigm shift compared to how `listen()` plays a role in typical oop event-driven architectures.
 
@@ -86,7 +97,7 @@ Think of it this way - listen is often a requirement, it's the flip-side of send
 
 See Steve's helpful analogy here: [http://sodium.nz/t/understanding-listen/171/2](http://sodium.nz/t/understanding-listen/171/2)
 
-## Listeners need management
+### Listeners need management
 
 Two rules:
 
@@ -100,19 +111,19 @@ This means the following:
 3. "dummy listeners" can be useful in certain scenarios, but it might be good to avoid that as a way of forcing better management
 4. Pipeline is important. You only need to listen() at the end - so if the stream is feeding into more frp you do not need to listen on that stream, only where it ends up.
 
-# Switch
+## Switch
 
-## Switch is more of a flatten() than a way to change things, usually
+### Switch is more of a flatten() than a way to change things, usually
 
 Changing things is inherent in frp itself. i.e. a changing menu screen might be represented just fine by a `Cell<Menu>` and be triggered by a `Stream<MenuChoice>`.
 
 Use switch where you need changes of changes. That's inherently complicated and the use-case switch is designed for. When you do need it, it is awesome!
 
-# Cells
+## Cell
 
 Even though Cells are very basic, I felt I needed some reminders of how to use them
 
-## Updating a cell based on a stream
+### Updating a cell based on a stream
 
 There are two ways to do this:
 
@@ -169,7 +180,7 @@ Transaction.run((): void => {
 });
 ```
 
-## Implicit delay
+### Implicit delay
 
 The docs state that Sodium’s hold has an implicit delay. In other words, stream updates will only see the values as updated in the previous transaction.
 

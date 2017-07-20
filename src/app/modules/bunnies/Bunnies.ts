@@ -56,7 +56,7 @@ export class Bunnies extends BaseContainer {
             sReady.listen(() => 
                 bunnies.forEach(b => { 
                     //note - there was an attempt to use cells for this but it was far less performant
-                    //still, there's very little "side effects" - just bunny.render()
+                    //still, there's very little "side effects" - just bunny.render() and it's over here in listen anyway
                     b.render(UpdateMotion(b.motion, bounds));
                 }))
         );

@@ -32,41 +32,56 @@ As of right now, here's what the different modules are for:
 
 ## Simple
 
-Moves a ball back and forth across the screen.
+**Watch a ball move back and forth across the screen.**
+
 Creates a `Cell` via a snapshot of the ticker, and listens to that directly for render changes
 
 ## Bunnies
+
+**Click the screen to spawn a bunch of bunnies**
 
 Conceptually it's the extension of Simple (and based on the PIXI Bunnymark).
 Driving the bunnies the way it was done in Simple did _not_ work. Speed slowed down _drastically_
 
 See [Steve's post](http://sodium.nz/t/understanding-listen/171/5?u=dakom) for further discussion.
 
-However, this should not be taken to mean that frp is broken or can't be used in situations like this. Rather, it means that a little bit of mutability sprinkled in at the end might be the right tool for the job - or perhaps one of Steve's other solutions
+However, this should not be taken to mean that frp is broken or can't be used in situations like this. Rather, it means that a little bit of mutability sprinkled in at the end might be the right tool for the job (as it is done here) - or perhaps one of Steve's other solutions
 
 ## Switch
 
-Each character has its frame index updated, and the displayed texture is driven by a switch of the character+frame (cell of a cell)
+**Click a button to change the animation**
+
+The displayed texture is driven by a `Switch` of the character+frame (cell of a cell. Each character has its frame index constantly updated)
 
 This is rather elegant imho - ultimately the logic is driven by just a few lines of code.
 
 ## Draw
 
-Drawing via PIXI rendertexture. This is an example of separating not just frp vs. ui, but separating the input out as well in a purer way.
+**Click anywhere on the screen to draw**
+
+This is an example of separating not just frp vs. ui, but separating the input out as well in a purer way.
+
+It's also an example of using the `collect` helper to drive a state-machine-like construct
 
 ## Move
 
-Moving different items around where state is handled by the parent container (allowing for setting the other inactive items as well)
+**Grab an object and move it around**
+
+This implements abstraction of FRP logic - resulting in a Draggable class
+
+Updates are dealt with both locally (via Draggable) and via the parent. In this example the parent simply sets the _selected_ hilight, though it could notify other objects as well.
 
 ## Drum Machine
 
-Sortof a culmination of all the previous modules, and some new stuff too.
+**Click boxes to set sound patterns. Drag the sliders to adjust speed and volume**
 
-The cool thing here is, again, when it comes down to it the core logic is tight and easy to reason about
+Sortof a culmination of all the previous modules, plus taking a couple of them a step further, and some new stuff too.
+
+The cool thing here is, again, when it comes down to it, the core logic is tight and easy to reason about.
 
 # Future
 
-There's a few areas that could probably be improved:
+There's a few areas that could be improved:
 
 1. Some snippets could probably be made a bit tighter with more familiarity of Ramda. That said, I did use it and some fp approaches in key places (e.g. repetitive layout things) and there's frequent use of js native map/reduce.
 
