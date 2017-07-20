@@ -54,5 +54,9 @@ export class Path {
         return DIST_SERVER + ("images/" + path);
     }
 
+    public static GetAudioPath(path: string): string {
+        return DIST_SERVER + ("audio/" + path);
+    }
+
 
 }

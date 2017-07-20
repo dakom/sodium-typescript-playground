@@ -37,6 +37,10 @@ module.exports = (function () {
       loc: 'cdnjs.cloudflare.com/ajax/libs/ramda/0.24.1/ramda.min.js',
       type: 'remote'
     },
+    {
+      loc: 'pixi-sound/pixi-sound.min.js',
+      type: 'dist'
+    },
   ];
 
 /*
