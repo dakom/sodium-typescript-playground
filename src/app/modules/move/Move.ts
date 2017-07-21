@@ -1,12 +1,12 @@
 import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink, Tuple2, lambda2, lambda3 } from "sodiumjs";
-import { BaseContainer } from "../../../lib/display/BaseContainer";
+import { SelfDisposingContainer } from "../../../lib/display/SelfDisposingContainer";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Draggable} from "../../../lib/draggable/Draggable";
 import { Shape, CreateShapes } from "./Move_UI";
 
 
-export class Move extends BaseContainer {
+export class Move extends SelfDisposingContainer {
     private unlisteners: Array<() => void>;
     private draggables:Array<Draggable>;
 

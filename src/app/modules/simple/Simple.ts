@@ -2,9 +2,9 @@
 import { Ticker } from "../../../lib/time/Ticker";
 import { Transaction, CellLoop } from "sodiumjs";
 import { Ball } from "./Simple_Ball";
-import { BaseContainer } from "../../../lib/display/BaseContainer";
+import { SelfDisposingContainer } from "../../../lib/display/SelfDisposingContainer";
 
-export class Simple extends BaseContainer {
+export class Simple extends SelfDisposingContainer {
     private ball:Ball;
     private ticker:Ticker;
 

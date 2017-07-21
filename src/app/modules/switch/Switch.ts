@@ -1,12 +1,12 @@
 import { Frames } from "../../../lib/time/Frames";
 import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink } from "sodiumjs";
-import { BaseContainer } from "../../../lib/display/BaseContainer";
+import { SelfDisposingContainer } from "../../../lib/display/SelfDisposingContainer";
 import { Character, CharacterConfig } from "./Switch_Character";
 import { Assets } from "./Switch_Assets";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
 
-export class Switch extends BaseContainer {
+export class Switch extends SelfDisposingContainer {
     private unlisteners: Array<() => void>;
     private assets: Assets;
     private characters: any;

@@ -1,10 +1,10 @@
-import { BaseContainer } from "../../../lib/display/BaseContainer";
+import { SelfDisposingContainer } from "../../../lib/display/SelfDisposingContainer";
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Row_UI, Block_UI} from "./DrumMachine_UI";
 import { MillisecondsTimerSystem, Cell, Transaction, CellLoop, CellSink, Stream, StreamSink} from "sodiumjs";
 import * as R from "ramda";
 
-export class Timer extends BaseContainer {
+export class Timer extends SelfDisposingContainer {
     public unlisten:() => void;
 
     private _cMeasure:Cell<number>;

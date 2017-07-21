@@ -1,9 +1,9 @@
 import {Cell, Stream, StreamSink} from "sodiumjs";
 import {MenuItem} from "./Menu";
 import {MenuButton_UI} from "./Menu_UI";
-import {BaseContainer} from "../../lib/display/BaseContainer"
+import {SelfDisposingContainer} from "../../lib/display/SelfDisposingContainer"
 
-export class MenuButton extends BaseContainer {
+export class MenuButton extends SelfDisposingContainer {
     private unlisten:() => void;
 
     private _sClicked:StreamSink<string>;

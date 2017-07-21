@@ -7,7 +7,7 @@ import { DrumMachine } from "./modules/drum_machine/DrumMachine";
 import {Draw} from "./modules/draw/Draw";
 import {Move} from "./modules/move/Move";
 import { CellLoop, StreamSink, Cell, Transaction } from "sodiumjs"
-import { BaseContainer } from "../lib/display/BaseContainer";
+import { SelfDisposingContainer } from "../lib/display/SelfDisposingContainer";
 import { FPS } from "./fps/FPS";
 
 
@@ -31,7 +31,7 @@ const fps: FPS = new FPS;
 stage.addChild(fps);
 
 //disposable stuff
-let currentModule: BaseContainer;
+let currentModule: SelfDisposingContainer;
 
 //top menu listener
 topMenu.sClicked.listen(id => {

@@ -1,5 +1,5 @@
 import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink, Tuple2, lambda2, lambda3 } from "sodiumjs";
-import { BaseContainer } from "../../../lib/display/BaseContainer";
+import { SelfDisposingContainer } from "../../../lib/display/SelfDisposingContainer";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Samplers } from "./DrumMachine_Samplers";
@@ -19,7 +19,7 @@ interface SoundLookup {
     [sampleId: string]: Sound;
 }
 
-export class DrumMachine extends BaseContainer {
+export class DrumMachine extends SelfDisposingContainer {
     private unlisteners: Array<() => void>;
     private assets: Assets;
 

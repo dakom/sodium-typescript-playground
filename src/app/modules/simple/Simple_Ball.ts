@@ -3,7 +3,7 @@ import * as R from "ramda";
 import {UI_Ball} from "./Simple_UI";
 import {CanvasWidth, CanvasHeight } from "../../main/Main";
 import {Stream, Transaction, CellLoop} from "sodiumjs";
-import { BaseContainer } from "../../../lib/display/BaseContainer";
+import { SelfDisposingContainer } from "../../../lib/display/SelfDisposingContainer";
 
 const SPEED = 10;
 const RADIUS = 50;
@@ -13,7 +13,7 @@ interface Motion {
     v:number;
 }
 
-export class Ball extends BaseContainer {
+export class Ball extends SelfDisposingContainer {
     private unlistener:() => void;
 
     constructor(private sTicks:Stream<number>) {

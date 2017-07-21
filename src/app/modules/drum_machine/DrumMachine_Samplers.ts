@@ -1,5 +1,5 @@
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
-import { BaseContainer } from "../../../lib/display/BaseContainer";
+import { SelfDisposingContainer } from "../../../lib/display/SelfDisposingContainer";
 import { Row_UI, Block_UI } from "./DrumMachine_UI";
 import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink } from "sodiumjs";
 import { CellSequence, spreadPosition } from "../../../lib/funcs/PrimitiveFuncs";
@@ -46,7 +46,7 @@ class Row extends PIXI.Container {
     }
 }
 
-export class Samplers extends BaseContainer {
+export class Samplers extends SelfDisposingContainer {
     private rows: Array<Row>;
 
     constructor(sampleIds:Array<string>) {

@@ -1,5 +1,5 @@
 import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink, Tuple2 } from "sodiumjs";
-import { BaseContainer } from "../../../lib/display/BaseContainer";
+import { SelfDisposingContainer } from "../../../lib/display/SelfDisposingContainer";
 import { Assets } from "./Draw_Assets";
 import { Canvas} from "./Draw_Canvas";
 import { TouchManager, TouchInfo, TouchType} from "./Draw_Touch";
@@ -12,7 +12,7 @@ export interface Point {
     y: number;
 }
 
-export class Draw extends BaseContainer {
+export class Draw extends SelfDisposingContainer {
     private unlisteners: Array<() => void>;
     private assets:Assets;
    

@@ -1,7 +1,7 @@
 import { Ticker } from "../../../lib/time/Ticker";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Transaction, CellLoop, StreamSink, CellSink} from "sodiumjs";
-import { BaseContainer } from "../../../lib/display/BaseContainer";
+import { SelfDisposingContainer } from "../../../lib/display/SelfDisposingContainer";
 import { Path } from "../../../lib/path/Path";
 import { Bunny } from "./Bunny";
 import { UI } from "./Bunnies_UI";
@@ -12,7 +12,7 @@ enum TOUCH {
     UP
 }
 
-export class Bunnies extends BaseContainer {
+export class Bunnies extends SelfDisposingContainer {
     private ticker: Ticker;
     private ui: UI;
     private unlisteners: Array<() => void>;

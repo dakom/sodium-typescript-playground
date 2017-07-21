@@ -1,4 +1,4 @@
-export abstract class BaseContainer extends PIXI.Container {
+export abstract class SelfDisposingContainer extends PIXI.Container {
     constructor() {
         super();
         this.once('removed', () => this.dispose());
