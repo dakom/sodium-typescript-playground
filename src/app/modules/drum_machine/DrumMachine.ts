@@ -20,17 +20,16 @@ interface SoundLookup {
 }
 
 export class DrumMachine extends SelfDisposingContainer {
-    private unlisteners: Array<() => void>;
-    private assets: Assets;
-
+    private _dispose: () => void;
+    
     constructor() {
         super();
 
-        this.unlisteners = new Array<() => void>();
+        const unlisteners = new Array<() => void>();
 
-        this.assets = new Assets();
-        this.unlisteners.push(
-            this.assets.load(sampleIds).listen(resources => {
+        const assets = new Assets();
+        unlisteners.push(
+            assets.load(sampleIds).listen(resources => {
                 //assign sounds from loaded assets
                 const soundLookup: SoundLookup = sampleIds.reduce((all: any, val: string) => {
                     all[val] = resources[val]["sound"];
@@ -67,7 +66,7 @@ export class DrumMachine extends SelfDisposingContainer {
                     timer.start(speedSlider.cPerc);
 
                     //get the current samples and play
-                    this.unlisteners.push(
+                    unlisteners.push(
                         volumeSlider.cPerc.listen(perc => {
                             soundList.forEach(sound => sound.volume = perc);
                         }),
@@ -82,13 +81,15 @@ export class DrumMachine extends SelfDisposingContainer {
                 });
             })
         );
+
+        this._dispose = () => {
+            unlisteners.forEach(unlistener => unlistener());
+            assets.dispose();
+            (window as any).PIXI.sound.removeAll();
+        }
     }
 
-
-
     dispose() {
-        this.unlisteners.forEach(unlistener => unlistener());
-        this.assets.dispose();
-        (window as any).PIXI.sound.removeAll();
+        this._dispose();
     }
 }

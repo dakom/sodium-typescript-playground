@@ -4,17 +4,16 @@ import { Simple } from "./modules/simple/Simple";
 import { Switch } from "./modules/switch/Switch";
 import { Bunnies } from "./modules/bunnies/Bunnies";
 import { DrumMachine } from "./modules/drum_machine/DrumMachine";
-import {Draw} from "./modules/draw/Draw";
-import {Move} from "./modules/move/Move";
-import { CellLoop, StreamSink, Cell, Transaction } from "sodiumjs"
+import { Draw } from "./modules/draw/Draw";
+import { Move } from "./modules/move/Move";
+import { CellLoop, StreamSink, Cell, Transaction, Operational } from "sodiumjs"
 import { SelfDisposingContainer } from "../lib/display/SelfDisposingContainer";
 import { FPS } from "./fps/FPS";
 
-
-
-//Core IO
+//Canvas/HTML setup
 Main.Init();
 
+//Core UI
 const stage = Main.app.stage;
 
 const topMenu = new Menu([
@@ -30,40 +29,30 @@ stage.addChild(topMenu);
 const fps: FPS = new FPS;
 stage.addChild(fps);
 
-//disposable stuff
-let currentModule: SelfDisposingContainer;
-
-//top menu listener
-topMenu.sClicked.listen(id => {
-    if (currentModule !== undefined) {
-        stage.removeChild(currentModule);
-        currentModule = undefined;
-    }
-
+//Main
+const cScene = topMenu.sClicked.map(id => {
     switch (id) {
-        case "simple": currentModule = new Simple();
-            break;
-        case "bunnies": currentModule = new Bunnies();
-            break;
-        case "switch": currentModule = new Switch();
-            break;
-        case "draw": currentModule = new Draw();
-            break;
-        case "move": currentModule = new Move();
-            break;
-        case "drum_machine": currentModule = new DrumMachine();
-            break;
+        case "simple": return new Simple();
+        case "bunnies": return new Bunnies();
+        case "switch": return new Switch();
+        case "draw": return new Draw();
+        case "move": return new Move();
+        case "drum_machine": return new DrumMachine();      
     }
+}).hold(undefined);
 
-    if (currentModule !== undefined) {
-        stage.addChild(currentModule);
+//using operational updates so we can get both the old value and the new one
+Operational.updates(cScene).snapshot(cScene, (newScene, oldScene) => {
+    if (oldScene !== undefined) {
+        stage.removeChild(oldScene);
     }
+    stage.addChild(newScene);
 
+}).listen(f => {
     //these should always be the top layer
     stage.setChildIndex(topMenu, stage.children.length - 1);
     stage.setChildIndex(fps, stage.children.length - 1);
+}); //dummy listener
 
-});
-
-//starting off...
+//force starting module (via menu)
 topMenu.forceId("simple");

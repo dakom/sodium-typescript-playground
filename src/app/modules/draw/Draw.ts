@@ -13,47 +13,49 @@ export interface Point {
 }
 
 export class Draw extends SelfDisposingContainer {
-    private unlisteners: Array<() => void>;
-    private assets:Assets;
-   
+    private _dispose: () => void;
+
     constructor() {
         super();
-        this.unlisteners = new Array<() => void>();
-        this.assets = new Assets();
+        const unlisteners = new Array<() => void>();
+        const assets = new Assets();
 
-        const sLoad = this.assets.load();
+        const sLoad = assets.load();
 
-        this.unlisteners.push(sLoad.listen(b => {
+        unlisteners.push(sLoad.listen(b => {
             Transaction.run((): void => {
-                const brush = new Brush(this.assets.getTexture());
+                const brush = new Brush(assets.getTexture());
                 const canvas = new Canvas(brush); //the canvas itself is very mutable
                 const touchManager = new TouchManager(canvas); //so touch processing and "state" is dealt with separately
                 
                 this.addChild(canvas);
 
-                this.unlisteners.push(
+                unlisteners.push(
                     touchManager.sTouch
                         .filter(t => t.type === TouchType.START)
                         .listen(t => canvas.drawBegin(t.point))
                 );
 
-                this.unlisteners.push(
+                unlisteners.push(
                     touchManager.sTouch
                         .filter(t => t.type === TouchType.MOVE)
                         .listen(t => canvas.drawUpdate(t.point))
                 );
 
-                this.unlisteners.push(
+                unlisteners.push(
                     touchManager.sTouch
                         .filter(t => t.type === TouchType.END)
                         .listen(t => canvas.drawEnd(t.point))
                 );
             });
         }));
+
+        this._dispose = () => {
+            unlisteners.forEach(unlistener => unlistener());
+        }
     }
 
     dispose() {
-        this.unlisteners.forEach(unlistener => unlistener());
-       
+        this._dispose();
     }
 }

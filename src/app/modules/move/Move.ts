@@ -7,13 +7,12 @@ import { Shape, CreateShapes } from "./Move_UI";
 
 
 export class Move extends SelfDisposingContainer {
-    private unlisteners: Array<() => void>;
-    private draggables:Array<Draggable>;
+    private _dispose: () => void;
 
     constructor() {
         super();
 
-        this.unlisteners = new Array<() => void>();
+        const unlisteners = new Array<() => void>();
 
         //ui
         const shapes = CreateShapes();
@@ -21,7 +20,6 @@ export class Move extends SelfDisposingContainer {
 
         //create draggables for ui elements, and assign for later disposing
         const draggables = shapes.map(shape => new Draggable(shape));
-        this.draggables = draggables;
 
         //combine all drag starts into one stream
         const sTouchStart = draggables
@@ -35,7 +33,7 @@ export class Move extends SelfDisposingContainer {
 
         //listen to updates and change highlight (position updates are handled via Draggable)
         Transaction.run((): void => {
-            this.unlisteners.push(
+            unlisteners.push(
                 sTouchStart.listen(target => {
                     (target as Shape).selected = true;
                 }),
@@ -45,11 +43,15 @@ export class Move extends SelfDisposingContainer {
                 }),
             );
         });
+
+        this._dispose = () => {
+            unlisteners.forEach(unlistener => unlistener());
+            draggables.forEach(drag => drag.dispose());
+        }
     }
 
     //cleanup
     dispose() {
-        this.unlisteners.forEach(unlistener => unlistener());
-        this.draggables.forEach(drag => drag.dispose());
+        this._dispose();
     }
 }
