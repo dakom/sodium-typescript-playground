@@ -52,7 +52,7 @@ Operational.updates(cScene).snapshot(cScene, (newScene, oldScene) => {
     //these should always be the top layer
     stage.setChildIndex(topMenu, stage.children.length - 1);
     stage.setChildIndex(fps, stage.children.length - 1);
-}); //dummy listener
+});
 
 //force starting module (via menu)
 topMenu.forceId("simple");
