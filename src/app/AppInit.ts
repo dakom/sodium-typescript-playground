@@ -48,7 +48,7 @@ Operational.updates(cScene).snapshot(cScene, (newScene, oldScene) => {
     }
     stage.addChild(newScene);
 
-}).listen(f => {
+}).listen(() => {
     //these should always be the top layer
     stage.setChildIndex(topMenu, stage.children.length - 1);
     stage.setChildIndex(fps, stage.children.length - 1);
