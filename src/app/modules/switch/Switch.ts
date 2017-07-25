@@ -31,7 +31,7 @@ export class Switch extends SelfDisposingContainer {
         //get all the loaders of all the characters
         const sLoad = assets.load(
             characterList
-                .map(chr => chr.paths)
+                .map(chr => chr.getPaths())
                 .reduce((acc: Array<string>, elem: Array<string>) => acc.concat(elem)))
 
 

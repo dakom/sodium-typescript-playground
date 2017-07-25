@@ -2,6 +2,7 @@ import { Assets } from "./Switch_Assets";
 import { CanvasWidth, CanvasHeight } from "../../main/Main";
 import { Transaction, CellSink, Cell, Stream, CellLoop } from "sodiumjs";
 import { Frames } from "../../../lib/time/Frames";
+import * as R from "ramda";
 
 export class CharacterConfig {
     constructor(public readonly baseId: string, public readonly len: number, public readonly scale: number) {}
@@ -9,23 +10,16 @@ export class CharacterConfig {
 
 export class Character  {
     private _textures: Array<PIXI.Texture>;
-    private _paths: Array<string>;
     private _cFrame:CellLoop<number>;
 
     private frames:Frames;
 
     constructor(public readonly config:CharacterConfig) {
-
-        //this could probably be done nicer with some ramda call...
-        this._paths = new Array<string>();
-        for (let i = 1; i < config.len; i++) {
-            this._paths.push(this.getPath(i));
-        }
-
+        //continuously update frame count
         Transaction.run((): void => {
             this._cFrame = new CellLoop<number>();
-            this._cFrame.listen(() => {});
-            this.frames = new Frames(3);
+            this._cFrame.listen(() => {}); //required dummy listener
+            this.frames = new Frames(3); //arbitrary frame speed to look okay
             const sFrameUpdate = this.frames.sFrames.snapshot(this._cFrame, (dt, val) => {
                 if(val == config.len -1) {
                     val = 0;
@@ -50,29 +44,20 @@ export class Character  {
        this.frames.stop();
     }
     public prepAssets(assets: Assets) {
-        //this could probably be done nicer with some ramda call...
-        this._textures = new Array<PIXI.Texture>();
-        for (let i = 1; i < this.config.len; i++) {
-            this._textures.push(assets.getTexture(this.getPath(i)))
-        }
-       
+        this._textures = this.getPaths().map(path => assets.getTexture(path));
     }
 
     public getTexture(fNum:number):PIXI.Texture {
         return this._textures[fNum];
     }
 
-    public get paths(): Array<string> {
-        return this._paths;
+    public getPaths(): Array<string> {
+       return R.times((n) => this.getPath(n+1), this.config.len);
     }
-
    
 
     getPath(frame: number): string {
-        let digit = frame.toString();
-        if (frame < 10) {
-            digit = "0" + frame;
-        }
+        const digit = (frame < 10) ? "0" + frame : frame.toString();
 
         return this.config.baseId + "/" + this.config.baseId + "_" + digit;
     }

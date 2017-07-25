@@ -1,4 +1,4 @@
-declare var DIST_SERVER: string;
+declare const DIST_SERVER: string;
 
 export class Path {
 

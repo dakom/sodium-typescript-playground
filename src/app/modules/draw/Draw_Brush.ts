@@ -1,3 +1,5 @@
+import * as R from "ramda";
+
 export class Brush {
     private pool: Array<PIXI.Sprite>;
     private _color:number;
@@ -23,12 +25,13 @@ export class Brush {
         //need to grow the pool first...
         if (this.pool.length < len) {
             const amount: number = len - this.pool.length;
-            for (let i = 0; i < amount; i++) {           
-                const sprite: PIXI.Sprite = new PIXI.Sprite(this.texture);
-                sprite.anchor.set(.5, .5);
-                sprite.tint = this._color;
-                this.pool.push(sprite);
-            }
+            R.repeat(() => new PIXI.Sprite(this.texture), amount)
+                .forEach(spriteF => {
+                    const sprite: PIXI.Sprite = spriteF();
+                    sprite.anchor.set(.5, .5);
+                    sprite.tint = this._color;
+                    this.pool.push(sprite);
+                });
         }
         return this.pool.splice(0, len);
     }

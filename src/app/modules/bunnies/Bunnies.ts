@@ -6,6 +6,7 @@ import { Path } from "../../../lib/path/Path";
 import { Bunny } from "./Bunny";
 import { UI } from "./Bunnies_UI";
 import { Motion, UpdateMotion, NewMotion } from "./Bunny_Motion";
+import * as R from "ramda";
 
 enum TOUCH {
     DOWN,
@@ -53,11 +54,12 @@ export class Bunnies extends SelfDisposingContainer {
             }),
             sCreating.listen(() => {
                 //Create bunnies while mouse is down
-                for (let i = 0; i < 100; i++) {
-                    const bunny = new Bunny(ui.texture);
-                    bunnyContainer.addChild(bunny);
-                    bunnies.push(bunny);
-                }
+                R.repeat(() => new Bunny(ui.texture), 100)
+                    .forEach(bunnyF => {
+                        const bunny = bunnyF();
+                        bunnyContainer.addChild(bunny);
+                        bunnies.push(bunny);
+                    });
 
                 ui.updateStatus(bunnies.length + " bunnies!");
             })
