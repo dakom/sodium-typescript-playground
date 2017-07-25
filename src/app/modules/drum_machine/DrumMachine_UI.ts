@@ -4,7 +4,7 @@ import * as R from "ramda";
 export class Row_UI extends PIXI.Container {
     constructor(onColor: number, offColor: number) {
         super();
-        const blocks = R.repeat(null, 16).map(() => new Block_UI(onColor, offColor));
+        const blocks = R.repeat(() => new Block_UI(onColor, offColor), 16).map(blockF => blockF());
 
         const positions = spreadPosition(10, "width", blocks);
         R.zipWith((ref, x) => ref.x = x, blocks, positions);
