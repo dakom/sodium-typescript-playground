@@ -28,7 +28,8 @@ export class Move extends SelfDisposingContainer {
 
         //combine all drag ends into one stream
         const sTouchEnd = draggables
-                .map(drag => drag.sEnd)
+                .map(drag => drag.sEnd
+                    .map(t => t.a)) //we're only interested in the displayobject, discard the diff point
                 .reduce((acc: Stream<PIXI.DisplayObject>, elem: Stream<PIXI.DisplayObject>) => acc.orElse(elem));
 
         //listen to updates and change highlight (position updates are handled via Draggable)

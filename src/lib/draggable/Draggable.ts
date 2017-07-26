@@ -12,15 +12,18 @@ export enum DraggableAxisLock {
 /*
     Note - right now, inside the class, things are pure... however if performance is an issue, 
     one easy cheat/remedy is to pass a private point to getLocalPosition() instead of undefined
+
+    Also, this class covers a few uses that might not be necessary much of the time - e.g. tracking the diff between start and stop
 */
 
 export class Draggable {
     //streams for listening externally
     //for move, use the provided point rather than the DisplayObject position
+    //for end, the point is the *difference* compared to initial position
     public sStart: Stream<PIXI.DisplayObject>;
     public sMove: Stream<Tuple2<PIXI.DisplayObject, PIXI.Point>>;
-    public sEnd: Stream<PIXI.DisplayObject>;
-
+    public sEnd: Stream<Tuple2<PIXI.DisplayObject, PIXI.Point>>;
+    
     //references for dispose()
     private unlisteners: Array<() => void>;
 
@@ -47,8 +50,13 @@ export class Draggable {
             const sTouchMove = new StreamSink<PIXI.interaction.InteractionEvent>();
             const sTouchEnd = new StreamSink<PIXI.interaction.InteractionEvent>();
 
-            //get the init position offset when it's touched
+            //get the init position when it's touched, for diffing against end on release
             const cInitPosition = sTouchStart
+                .map(evt => evt.data.getLocalPosition(displayTarget.parent, undefined, evt.data.global))
+                .hold(new PIXI.Point());
+
+            //get the init position offset when it's touched
+            const cInitLocalPosition = sTouchStart
                 //get coordinates relative to the object itself (i.e. inner coordinates)
                 .map(evt => evt.data.getLocalPosition(displayTarget, undefined, evt.data.global))
                 .hold(new PIXI.Point());
@@ -62,7 +70,7 @@ export class Draggable {
             //get the move position
             const sMovePosition = sTouchMove
                 .gate(cDraggingGate) //only if we're dragging
-                .snapshot(cInitPosition, (evt, initPos) => {
+                .snapshot(cInitLocalPosition, (evt, initPos) => {
                     //map to coordinates based on parent
                     const pos = evt.data.getLocalPosition(displayTarget.parent, undefined, evt.data.global);
                     pos.x -= initPos.x;
@@ -84,7 +92,12 @@ export class Draggable {
             //assignments for external and internal use
             this.sStart = sTouchStart.map(evt => displayTarget);
             this.sMove = sMovePosition.map(p => new Tuple2<PIXI.DisplayObject, PIXI.Point>(displayTarget, p));
-            this.sEnd = sTouchEnd.map(evt => displayTarget);
+            this.sEnd = sTouchEnd.snapshot(cInitPosition, (evt, initPos) => {
+                const pos = evt.data.getLocalPosition(displayTarget.parent, undefined, evt.data.global);
+                pos.x -= initPos.x;
+                pos.y -= initPos.y;
+                return pos;
+            }).map(pDiff => new Tuple2<PIXI.DisplayObject, PIXI.Point>(displayTarget, pDiff));
 
             //named callbacks so that we can off() them explicitly
             this.dispatchStart = evt => sTouchStart.send(evt);
