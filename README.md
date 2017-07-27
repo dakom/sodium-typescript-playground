@@ -69,19 +69,21 @@ This is an example of separating not just frp vs. ui, but separating the input o
 
 It's also an example of using the `collect` helper to drive a state-machine-like construct
 
-## Move
+## Move / Tap
 
-**Grab an object and move it around**
+**Grab an object and move it around. Tap to see its name**
 
-This implements abstraction of FRP logic - resulting in a Draggable class
+This implements abstraction of FRP logic - resulting in a Draggable class.
 
 Updates are dealt with both locally (via Draggable) and via the parent. In this example the parent simply sets the _selected_ hilight, though it could notify other objects as well.
+
+It's also a nice illustration of merging and filtering streams to get views of data as needed (e.g. tap vs. drag end)
 
 ## Drum Machine
 
 **Click boxes to set sound patterns. Drag the sliders to adjust speed and volume**
 
-Sortof a culmination of all the previous modules, plus taking a couple of them a step further, and some new stuff too.
+Uses techniques from most of the previous modules, plus taking a couple of them a step further, and some new stuff too.
 
 The cool thing here is, again, when it comes down to it, the core logic is tight and easy to reason about.
 

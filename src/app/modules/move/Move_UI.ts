@@ -11,7 +11,7 @@ export interface ShapeOptions {
 export class Shape extends PIXI.Graphics {
     private _selected: boolean = false;
 
-    constructor(private opts: ShapeOptions) {
+    constructor(public readonly opts: ShapeOptions) {
         super();
         this.interactive = this.buttonMode = true;
         this.redraw();

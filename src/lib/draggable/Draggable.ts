@@ -1,47 +1,54 @@
-import { Transaction, StreamSink, Stream, Cell, Tuple2 } from "sodiumjs";
+import { Transaction, StreamSink, Stream, Cell } from "sodiumjs";
 import { Main } from "../../app/main/Main";
 import { DraggableValidator } from "./Draggable_Validator";
 
+const TAP_SPACE_THRESHHOLD = 2;
+const TAP_TIME_THRESHHOLD = 250;
+
 export enum DraggableAxisLock {
-    NONE,
     X,
     Y,
     BOTH
 }
 
-/*
-    Note - right now, inside the class, things are pure... however if performance is an issue, 
-    one easy cheat/remedy is to pass a private point to getLocalPosition() instead of undefined
+export interface DraggableOptions {
+    forceInteractive?: boolean; //default true
+    axisLock?: DraggableAxisLock; //undefined does nothing
+    validator?: DraggableValidator; //undefined sets always-valid validator
+}
 
-    Also, this class covers a few uses that might not be necessary much of the time - e.g. tracking the diff between start and stop
-*/
+
+export enum DraggableEventType {
+    START,
+    MOVE,
+    END,
+}
+
+export enum DraggableGesture {
+    TAP
+}
+
+export interface DraggableEvent {
+    readonly type: DraggableEventType;
+    readonly displayTarget: PIXI.DisplayObject;
+    readonly point: PIXI.Point;
+    readonly timestamp: number;
+    readonly pixiEvent: PIXI.interaction.InteractionEvent;
+    readonly gesture?: DraggableGesture;
+}
 
 export class Draggable {
-    //streams for listening externally
-    //for move, use the provided point rather than the DisplayObject position
-    //for end, the point is the *difference* compared to initial position
-    public sStart: Stream<PIXI.DisplayObject>;
-    public sMove: Stream<Tuple2<PIXI.DisplayObject, PIXI.Point>>;
-    public sEnd: Stream<Tuple2<PIXI.DisplayObject, PIXI.Point>>;
-    
+    public sEvent: Stream<DraggableEvent>;
+
     //references for dispose()
-    private unlisteners: Array<() => void>;
+    private _dispose: () => void;
 
-    private dispatchStart: (evt: PIXI.interaction.InteractionEvent) => void;
-    private dispatchMove: (evt: PIXI.interaction.InteractionEvent) => void;
-    private dispatchEnd: (evt: PIXI.interaction.InteractionEvent) => void;
 
-    constructor(private displayTarget: PIXI.DisplayObject, validator?:DraggableValidator, axisLock?:DraggableAxisLock) {
-        displayTarget.interactive = displayTarget.buttonMode = true;
+    constructor(private displayTarget: PIXI.DisplayObject, options?: DraggableOptions) {
+        options = normalizeOptions(options);
 
-        this.unlisteners = new Array<() => void>();
-
-        if(validator === undefined) {
-            validator = (displayTarget, point) => true;
-        }
-
-        if(axisLock === undefined) {
-            axisLock = DraggableAxisLock.NONE;
+        if (options.forceInteractive) {
+            displayTarget.interactive = displayTarget.buttonMode = true;
         }
 
         Transaction.run((): void => {
@@ -50,94 +57,157 @@ export class Draggable {
             const sTouchMove = new StreamSink<PIXI.interaction.InteractionEvent>();
             const sTouchEnd = new StreamSink<PIXI.interaction.InteractionEvent>();
 
-            //get the init position when it's touched, for diffing against end on release
-            const cInitPosition = sTouchStart
-                .map(evt => evt.data.getLocalPosition(displayTarget.parent, undefined, evt.data.global))
-                .hold(new PIXI.Point());
+            //shorthand for getting only the active start events
+            const sTouchStartActive = sTouchStart
+                .filterNotNull();
 
-            //get the init position offset when it's touched
-            const cInitLocalPosition = sTouchStart
-                //get coordinates relative to the object itself (i.e. inner coordinates)
-                .map(evt => evt.data.getLocalPosition(displayTarget, undefined, evt.data.global))
-                .hold(new PIXI.Point());
+            //touch start events
+            const sStart = sTouchStartActive
+                .map(evt => makeEvent(DraggableEventType.START, evt, true));
 
-            //dragging state (boolean, whether there's a valid event in sTouchStart or not)
-            const cDraggingGate = sTouchStart
-                .orElse(sTouchEnd.map(evt => null)) //map sTouchEnd to always be null for evaluation purposes here
+            //contains initial position at first touch
+            const cStartPosition = sStart
+                .hold(null);
+
+            //contains initial offset at first touch
+            const cStartOffset = sTouchStartActive
+                .map(evt => makeEvent(null, evt, false))
+                .hold(null);
+
+            //gate to check if dragging
+            const cDragging = sTouchStart
                 .map(evt => evt === null ? false : true)
                 .hold(false);
 
-            //get the move position
-            const sMovePosition = sTouchMove
-                .gate(cDraggingGate) //only if we're dragging
-                .snapshot(cInitLocalPosition, (evt, initPos) => {
-                    //map to coordinates based on parent
-                    const pos = evt.data.getLocalPosition(displayTarget.parent, undefined, evt.data.global);
-                    pos.x -= initPos.x;
-                    pos.y -= initPos.y;
+            //move events - only if dragging
+            //values are adjusted by offset
+            //events are filtered by validation
+            const sMove = sTouchMove
+                .gate(cDragging)
+                .map(evt => makeEvent(DraggableEventType.MOVE, evt, true))
+                .snapshot(cStartOffset, (moveEvent, offsetEvent) => ChangeEventPoint(moveEvent, getOffset(moveEvent.point, offsetEvent.point)))
+                .filter(evt => options.validator(evt));
 
-                    //account for axis lock
-                    if(axisLock === DraggableAxisLock.X || axisLock === DraggableAxisLock.BOTH) {
-                        pos.x = displayTarget.x;
-                    }
-                    if(axisLock === DraggableAxisLock.Y || axisLock === DraggableAxisLock.BOTH) {
-                        pos.y = displayTarget.y;
-                    }
+            //end events - only if dragging
+            //gestures are detected and added here
+            const sEnd = sTouchEnd
+                .gate(cDragging)
+                .map(evt => makeEvent(DraggableEventType.END, evt, true))
+                .snapshot(cStartPosition, (endEvent, initEvent) => ChangeEventGesture(endEvent, getGesture(initEvent, endEvent)));
 
-                    return pos;
-                })
-                .map(pos => validator(displayTarget, pos) ? pos : null) //only if it's validated
-                .filterNotNull();
-            
-            //assignments for external and internal use
-            this.sStart = sTouchStart.map(evt => displayTarget);
-            this.sMove = sMovePosition.map(p => new Tuple2<PIXI.DisplayObject, PIXI.Point>(displayTarget, p));
-            this.sEnd = sTouchEnd.snapshot(cInitPosition, (evt, initPos) => {
-                const pos = evt.data.getLocalPosition(displayTarget.parent, undefined, evt.data.global);
-                pos.x -= initPos.x;
-                pos.y -= initPos.y;
-                return pos;
-            }).map(pDiff => new Tuple2<PIXI.DisplayObject, PIXI.Point>(displayTarget, pDiff));
+            //mappings for external use - all merged into one single event stream
+            //this is correct, since only one of these should be happening at any moment in time
+            this.sEvent = sStart.orElse(sMove).orElse(sEnd);
 
-            //named callbacks so that we can off() them explicitly
-            this.dispatchStart = evt => sTouchStart.send(evt);
-            this.dispatchMove = evt => sTouchMove.send(evt);
-            this.dispatchEnd = evt => sTouchEnd.send(evt);
- 
-            //display listener
-            displayTarget.on('pointerdown', this.dispatchStart);
+            //named callbacks for listeners so that we can off() them explicitly
+            //end will also send a null to start so that start events can be gated
+            const dispatchStart = evt => sTouchStart.send(evt);
+            const dispatchMove = evt => sTouchMove.send(evt);
+            const dispatchEnd = evt => { sTouchEnd.send(evt); sTouchStart.send(null); }
 
             //frp listeners
-            this.unlisteners.push(
+            const unlisteners = new Array<() => void>();
+            unlisteners.push(
                 //use named functions so we can remove them
-                this.sStart.listen(d => {
-                    Main.app.renderer.plugins.interaction.on('pointermove', this.dispatchMove);
-                    Main.app.renderer.plugins.interaction.on('pointerup', this.dispatchEnd);
-                    Main.app.renderer.plugins.interaction.on('pointeroutside', this.dispatchEnd);
-                }),
-                this.sEnd.listen(d => {
-                    
-                    Main.app.renderer.plugins.interaction.off('pointermove', this.dispatchMove);
-                    Main.app.renderer.plugins.interaction.off('pointerup', this.dispatchEnd);
-                    Main.app.renderer.plugins.interaction.off('pointeroutside', this.dispatchEnd);
-                }),
+                sTouchStart.listen(() => toggleGlobalListeners(true)),
+                sTouchEnd.listen(() => toggleGlobalListeners(false)),
 
                 //move it!
-                this.sMove.listen(t => {
-                    t.a.position.set(t.b.x, t.b.y)
-                }),
+                sMove.listen(evt => displayTarget.position.set(evt.point.x, evt.point.y)),
             );
+
+            //cleanup
+            this._dispose = () => {
+                unlisteners.forEach(unlistener => unlistener());
+
+                displayTarget.off('pointerdown', dispatchStart);
+
+                toggleGlobalListeners(false);
+            }
+
+            //display listeners
+            displayTarget.on('pointerdown', dispatchStart);
+            const toggleGlobalListeners = (flag: boolean) => {
+                if (flag) {
+                    Main.app.renderer.plugins.interaction.on('pointermove', dispatchMove);
+                    Main.app.renderer.plugins.interaction.on('pointerup', dispatchEnd);
+                    Main.app.renderer.plugins.interaction.on('pointeroutside', dispatchEnd);
+                } else {
+                    Main.app.renderer.plugins.interaction.off('pointermove', dispatchMove);
+                    Main.app.renderer.plugins.interaction.off('pointerup', dispatchEnd);
+                    Main.app.renderer.plugins.interaction.off('pointeroutside', dispatchEnd);
+                }
+            }
         });
+
+
+        //helper functions
+        function makeEvent(eventType: DraggableEventType, evt: PIXI.interaction.InteractionEvent, coordsIsParent: boolean): DraggableEvent {
+            //note - for performance increase in exchange for purity, a local cached point could be used instead of undefined
+            return {
+                type: eventType,
+                displayTarget: displayTarget,
+                point: evt.data.getLocalPosition(coordsIsParent ? displayTarget.parent : displayTarget, undefined, evt.data.global),
+                timestamp: Date.now(),
+                pixiEvent: evt
+            }
+        }
+
+        function getOffset(movePoint: PIXI.Point, offsetPoint: PIXI.Point): PIXI.Point {
+            let x = movePoint.x - offsetPoint.x;
+            let y = movePoint.y - offsetPoint.y;
+
+            if (options.axisLock !== undefined && (options.axisLock === DraggableAxisLock.X || options.axisLock === DraggableAxisLock.BOTH)) {
+                x = displayTarget.x;
+            }
+            if (options.axisLock !== undefined && (options.axisLock === DraggableAxisLock.Y || options.axisLock === DraggableAxisLock.BOTH)) {
+                y = displayTarget.y;
+            }
+
+            return new PIXI.Point(x, y);
+        }
+
+        function getGesture(startEvent: DraggableEvent, endEvent: DraggableEvent): DraggableGesture {
+            //just tap for now
+            return Gesture_IsTap() ? DraggableGesture.TAP : undefined;
+
+            function Gesture_IsTap(): boolean {
+                const xDiff = Math.abs(startEvent.point.x - endEvent.point.x);
+                const yDiff = Math.abs(startEvent.point.y - endEvent.point.y);
+                const timeDiff = endEvent.timestamp - startEvent.timestamp;
+
+                return (timeDiff < TAP_TIME_THRESHHOLD && xDiff < TAP_SPACE_THRESHHOLD && yDiff < TAP_SPACE_THRESHHOLD) ? true : false;
+            }
+        }
+
+        function ChangeEventGesture(event: DraggableEvent, gesture: DraggableGesture): DraggableEvent {
+            return Object.assign({ ...event }, { gesture: gesture });
+        }
+
+        function ChangeEventPoint(event: DraggableEvent, point: PIXI.Point): DraggableEvent {
+            return Object.assign({ ...event }, { point: point });
+        }
+
+        function normalizeOptions(options: DraggableOptions): DraggableOptions {
+            if (options === undefined) {
+                return (normalizeOptions({}));
+            }
+
+            if (options.forceInteractive === undefined) {
+                options.forceInteractive = true;
+            }
+
+            if (options.validator === undefined) {
+                options.validator = () => true;
+            }
+
+            return options;
+
+        }
     }
 
     dispose() {
-        this.unlisteners.forEach(unlistener => unlistener());
-
-        this.displayTarget.off('pointerdown', this.dispatchStart);
-
-        Main.app.renderer.plugins.interaction.off('pointermove', this.dispatchMove);
-        Main.app.renderer.plugins.interaction.off('pointerup', this.dispatchEnd);
-        Main.app.renderer.plugins.interaction.off('pointeroutside', this.dispatchEnd);
+        this._dispose();
     }
 }
 

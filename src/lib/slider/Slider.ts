@@ -1,5 +1,5 @@
 import { Transaction, StreamSink, Stream, Cell, Tuple2 } from "sodiumjs";
-import { Draggable, DraggableAxisLock } from "../draggable/Draggable";
+import { Draggable, DraggableAxisLock, DraggableEventType } from "../draggable/Draggable";
 import {HorizontalValidator, VerticalValidator} from "../draggable/Draggable_Validator"
 import * as R from "ramda";
 
@@ -71,13 +71,15 @@ export class Slider extends PIXI.Container {
         Transaction.run((): void => {
             //create dragger
             const kDrag = new Draggable(knob,
-                (opts.dir === Direction.HORIZONTAL) ? HorizontalValidator(min, max) : VerticalValidator(min, max),
-                (opts.dir === Direction.HORIZONTAL) ? DraggableAxisLock.Y : DraggableAxisLock.X
+                {
+                    validator: (opts.dir === Direction.HORIZONTAL) ? HorizontalValidator(min, max) : VerticalValidator(min, max),
+                    axisLock: (opts.dir === Direction.HORIZONTAL) ? DraggableAxisLock.Y : DraggableAxisLock.X
+                }
             );
 
             //set perc stream for reading
-            this.sPerc = kDrag.sMove
-                            .map(t => getPerc((opts.dir === Direction.HORIZONTAL) ? t.b.x : t.b.y));
+            this.sPerc = kDrag.sEvent.filter(evt => evt.type === DraggableEventType.MOVE)
+                            .map(evt => getPerc((opts.dir === Direction.HORIZONTAL) ? evt.point.x : evt.point.y));
                             
             this.cPerc = this.sPerc.hold(opts.initPerc);
         });

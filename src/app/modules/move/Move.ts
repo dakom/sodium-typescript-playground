@@ -2,7 +2,7 @@ import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink, Tuple2, lamb
 import { SelfDisposingContainer } from "../../../lib/display/SelfDisposingContainer";
 import { Menu, CreateMenuItem } from "../../../lib/menu/Menu";
 import { Main, CanvasWidth, CanvasHeight } from "../../main/Main";
-import {Draggable} from "../../../lib/draggable/Draggable";
+import {Draggable, DraggableEvent, DraggableEventType, DraggableGesture} from "../../../lib/draggable/Draggable";
 import { Shape, CreateShapes } from "./Move_UI";
 
 
@@ -21,27 +21,31 @@ export class Move extends SelfDisposingContainer {
         //create draggables for ui elements, and assign for later disposing
         const draggables = shapes.map(shape => new Draggable(shape));
 
-        //combine all drag starts into one stream
-        const sTouchStart = draggables
-                .map(drag => drag.sStart)
-                .reduce((acc: Stream<PIXI.DisplayObject>, elem: Stream<PIXI.DisplayObject>) => acc.orElse(elem));
-
-        //combine all drag ends into one stream
-        const sTouchEnd = draggables
-                .map(drag => drag.sEnd
-                    .map(t => t.a)) //we're only interested in the displayobject, discard the diff point
-                .reduce((acc: Stream<PIXI.DisplayObject>, elem: Stream<PIXI.DisplayObject>) => acc.orElse(elem));
+        //combine all drag events into one stream (we're not interested in multi-touch)
+        const sDragEvents = draggables
+                .map(drag => drag.sEvent)
+                .reduce((acc: Stream<DraggableEvent>, elem: Stream<DraggableEvent>) => acc.orElse(elem));
 
         //listen to updates and change highlight (position updates are handled via Draggable)
         Transaction.run((): void => {
             unlisteners.push(
-                sTouchStart.listen(target => {
-                    (target as Shape).selected = true;
-                }),
+                sDragEvents
+                    .filter(evt => evt.type === DraggableEventType.START)
+                    .listen(evt => {
+                        (evt.displayTarget as Shape).selected = true;
+                    }),
 
-                sTouchEnd.listen(target => {
-                    (target as Shape).selected = false;
-                }),
+                sDragEvents
+                    .filter(evt => evt.type === DraggableEventType.END)
+                    .listen(evt => {
+                        (evt.displayTarget as Shape).selected = false;
+                    }),
+
+                sDragEvents
+                    .filter(evt => evt.gesture === DraggableGesture.TAP)
+                    .listen(evt => {
+                        alert((evt.displayTarget as Shape).opts.type + " was tapped!")
+                    }),
             );
         });
 

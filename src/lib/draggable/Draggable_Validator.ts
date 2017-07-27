@@ -1,24 +1,25 @@
+import {DraggableEvent} from "./Draggable";
 
 export interface DraggableValidator {
-    (displayTarget: PIXI.DisplayObject, point:PIXI.Point): boolean;
+    (evt:DraggableEvent): boolean;
 }
 
 export function HorizontalValidator(xMin:number, xMax:number): DraggableValidator {
-    return function(displayTarget: PIXI.DisplayObject, point:PIXI.Point) {
-        return (point.x >= xMin && point.x <= xMax) ? true : false;
+    return function(evt:DraggableEvent) {
+        return (evt.point.x >= xMin && evt.point.x <= xMax) ? true : false;
     }
 }
 
 export function VerticalValidator(yMin:number, yMax:number): DraggableValidator {
-    return function(displayTarget: PIXI.DisplayObject, point:PIXI.Point) {
-        return (point.y >= yMin && point.y <= yMax) ? true : false;
+    return function(evt:DraggableEvent) {
+        return (evt.point.y >= yMin && evt.point.y <= yMax) ? true : false;
     }
 }
 
 export function RectValidator(rect:PIXI.Rectangle): DraggableValidator {
-    return function(displayTarget: PIXI.DisplayObject, point:PIXI.Point) {
+    return function(evt:DraggableEvent) {
         const hValidator = HorizontalValidator(rect.x, rect.x + rect.width);
         const vValidator = VerticalValidator(rect.y, rect.y + rect.height);
-        return (hValidator(displayTarget, point) && vValidator(displayTarget, point));
+        return (hValidator(evt) && vValidator(evt));
     }
 }
