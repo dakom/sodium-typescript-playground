@@ -21,7 +21,7 @@ const topMenu = new Menu([
     CreateMenuItem("bunnies"),
     CreateMenuItem("switch"),
     CreateMenuItem("draw"),
-    CreateMenuItem("move", "move tap"),
+    CreateMenuItem("move", "move & tap"),
     CreateMenuItem("drum_machine", "drum machine")
 ]);
 stage.addChild(topMenu);
@@ -55,5 +55,4 @@ Operational.updates(cScene).snapshot(cScene, (newScene, oldScene) => {
 });
 
 //force starting module (via menu)
-//topMenu.forceId("simple");
-topMenu.forceId("drum_machine");
+topMenu.forceId("simple");
