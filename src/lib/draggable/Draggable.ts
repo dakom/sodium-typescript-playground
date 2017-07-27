@@ -99,35 +99,22 @@ export class Draggable {
             //this is correct, since only one of these should be happening at any moment in time
             this.sEvent = sStart.orElse(sMove).orElse(sEnd);
 
-            //named callbacks for listeners so that we can off() them explicitly
-            //end will also send a null to start so that start events can be gated
-            const dispatchStart = evt => sTouchStart.send(evt);
-            const dispatchMove = evt => sTouchMove.send(evt);
-            const dispatchEnd = evt => { sTouchEnd.send(evt); sTouchStart.send(null); }
-
-            //frp listeners
+            //frp listeners for side-effects
             const unlisteners = new Array<() => void>();
             unlisteners.push(
-                //use named functions so we can remove them
                 sTouchStart.listen(() => toggleGlobalListeners(true)),
                 sTouchEnd.listen(() => toggleGlobalListeners(false)),
-
-                //move it!
                 sMove.listen(evt => displayTarget.position.set(evt.point.x, evt.point.y)),
             );
 
-            //cleanup
-            this._dispose = () => {
-                unlisteners.forEach(unlistener => unlistener());
-
-                displayTarget.off('pointerdown', dispatchStart);
-
-                toggleGlobalListeners(false);
-            }
-
-            //display listeners
+            //display listeners, named so that we can off() them explicitly
+            const dispatchStart = evt => sTouchStart.send(evt);
+            const dispatchMove = evt => sTouchMove.send(evt);
+            const dispatchEnd = evt => { sTouchEnd.send(evt); sTouchStart.send(null); } //send null to reset cDragging
+            
             displayTarget.on('pointerdown', dispatchStart);
-            const toggleGlobalListeners = (flag: boolean) => {
+
+            function toggleGlobalListeners(flag: boolean) {
                 if (flag) {
                     Main.app.renderer.plugins.interaction.on('pointermove', dispatchMove);
                     Main.app.renderer.plugins.interaction.on('pointerup', dispatchEnd);
@@ -137,6 +124,15 @@ export class Draggable {
                     Main.app.renderer.plugins.interaction.off('pointerup', dispatchEnd);
                     Main.app.renderer.plugins.interaction.off('pointeroutside', dispatchEnd);
                 }
+            }
+
+            //cleanup
+            this._dispose = () => {
+                unlisteners.forEach(unlistener => unlistener());
+
+                displayTarget.off('pointerdown', dispatchStart);
+
+                toggleGlobalListeners(false);
             }
         });
 
