@@ -54,52 +54,50 @@ export class Canvas extends PIXI.Sprite {
     //algorithm adapted from http://cboard.cprogramming.com/game-programming/67832-line-drawing-algorithm.html#post485086
     getLine(x1: number, y1: number, x2: number, y2: number): Array<Point> {
         const line = new Array<Point>();
-        
-        let dx: number;
-        let dy: number;
-        let inx: number;
-        let iny: number;
-        let e: number;
-        
+        const d = new PIXI.Point();
+        const i = new PIXI.Point();
+
+        let e:number;
+       
 
 
         if (x1 == x2 && y1 == y2) {
             return line;
         }
 
-        dx = x2 - x1;
-        dy = y2 - y1;
-        inx = dx > 0 ? 1 : -1;
-        iny = dy > 0 ? 1 : -1;
+        d.x = x2 - x1;
+        d.y = y2 - y1;
+        i.x = d.x > 0 ? 1 : -1;
+        i.y = d.y > 0 ? 1 : -1;
 
-        dx = Math.abs(dx);
-        dy = Math.abs(dy);
+        d.x = Math.abs(d.x);
+        d.y = Math.abs(d.y);
 
-        if (dx >= dy) {
-            dy <<= 1;
-            e = dy - dx;
-            dx <<= 1;
+        if (d.x >= d.y) {
+            d.y <<= 1;
+            e = d.y - d.x;
+            d.x <<= 1;
             while (x1 != x2) {
                 line.push({ x: x1, y: y1 });
                 if (e >= 0) {
-                    y1 += iny;
-                    e -= dx;
+                    y1 += i.y;
+                    e -= d.x;
                 }
-                e += dy;
-                x1 += inx;
+                e += d.y;
+                x1 += i.x;
             }
         } else {
-            dx <<= 1;
-            e = dx - dy;
-            dy <<= 1;
+            d.x <<= 1;
+            e = d.x - d.y;
+            d.y <<= 1;
             while (y1 != y2) {
                 line.push({ x: x1, y: y1 });
                 if (e >= 0) {
-                    x1 += inx;
-                    e -= dy;
+                    x1 += i.x;
+                    e -= d.y;
                 }
-                e += dx;
-                y1 += iny;
+                e += d.x;
+                y1 += i.y;
             }
         }
         line.push({ x: x1, y: y1 });

@@ -30,7 +30,7 @@ The meat of the code is generally in [src/app/modules](src/app/modules)
 
 There are some comments written in key sections, though maybe one of these days I'll go through and sprinkle in some more...
 
-One thing you may notice is that there are no `vars`, and only 5 `lets` (all of which are in the imperative [line-calculation code](src/app/modules/draw/Draw_Canvas.ts)). That's not to say there aren't any variables - there's around 140 `consts`.
+One thing you may notice is that there are no `vars`, and only 1 `let` (in the imperative [line-calculation code](src/app/modules/draw/Draw_Canvas.ts)). That's not to say there aren't any variables - there's around 140 `consts`, and side-effect code often modifies properties of those consts (esp PIXI.Point). But still, this is kinda cool :)
 
 Keep in mind for each module that it may need to load some remote media, and there's no preloader... so if nothing's on the screen give it a couple seconds (except for draw - just try touching the screen, it'll start working when the brush is loaded)
 

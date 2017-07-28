@@ -140,13 +140,13 @@ export class Draggable {
         //helper functions
         function makeEvent(eventType: DraggableEventType, evt: PIXI.interaction.InteractionEvent, coordsIsParent: boolean): DraggableEvent {
             //note - for performance increase in exchange for purity, a local cached point could be used instead of undefined
-            return {
+            return Object.freeze({
                 type: eventType,
                 displayTarget: displayTarget,
                 point: evt.data.getLocalPosition(coordsIsParent ? displayTarget.parent : displayTarget, undefined, evt.data.global),
                 timestamp: Date.now(),
                 pixiEvent: evt
-            }
+            });
         }
 
         function getOffset(movePoint: PIXI.Point, offsetPoint: PIXI.Point): PIXI.Point {
@@ -178,11 +178,11 @@ export class Draggable {
         }
 
         function ChangeEventGesture(event: DraggableEvent, gesture: DraggableGesture): DraggableEvent {
-            return Object.assign({ ...event }, { gesture: gesture });
+            return Object.freeze(Object.assign({ ...event }, { gesture: gesture }));
         }
 
         function ChangeEventPoint(event: DraggableEvent, point: PIXI.Point): DraggableEvent {
-            return Object.assign({ ...event }, { point: point });
+            return Object.freeze(Object.assign({ ...event }, { point: point }));
         }
 
         function normalizeOptions(options: DraggableOptions): DraggableOptions {
