@@ -150,8 +150,9 @@ export class Draggable {
         }
 
         function getOffset(movePoint: PIXI.Point, offsetPoint: PIXI.Point): PIXI.Point {
-            let x = movePoint.x - offsetPoint.x;
-            let y = movePoint.y - offsetPoint.y;
+            let x = movePoint.x - (offsetPoint.x * displayTarget.scale.x);
+            let y = movePoint.y - (offsetPoint.y * displayTarget.scale.y);
+
 
             if (options.axisLock !== undefined && (options.axisLock === DraggableAxisLock.X || options.axisLock === DraggableAxisLock.BOTH)) {
                 x = displayTarget.x;
