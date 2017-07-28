@@ -44,7 +44,7 @@ export class Draggable {
     private _dispose: () => void;
 
 
-    constructor(private displayTarget: PIXI.DisplayObject, options?: DraggableOptions) {
+    constructor(public readonly displayTarget: PIXI.DisplayObject, options?: DraggableOptions) {
         options = normalizeOptions(options);
 
         if (options.forceInteractive) {
