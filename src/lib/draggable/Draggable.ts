@@ -12,7 +12,8 @@ export enum DraggableAxisLock {
 }
 
 export interface DraggableOptions {
-    forceInteractive?: boolean; //default true
+    cEnabled?: Cell<boolean>; //enable/disable from the outside
+    makeInteractive?: boolean; //default true
     axisLock?: DraggableAxisLock; //undefined does nothing
     validator?: DraggableValidator; //undefined sets always-valid validator
 }
@@ -47,7 +48,7 @@ export class Draggable {
     constructor(public readonly displayTarget: PIXI.DisplayObject, options?: DraggableOptions) {
         options = normalizeOptions(options);
 
-        if (options.forceInteractive) {
+        if (options.makeInteractive) {
             displayTarget.interactive = displayTarget.buttonMode = true;
         }
 
@@ -59,19 +60,20 @@ export class Draggable {
 
             //shorthand for getting only the active start events
             const sTouchStartActive = sTouchStart
+                .gate(options.cEnabled)
                 .filterNotNull();
 
             //touch start events
             const sStart = sTouchStartActive
                 .map(evt => makeEvent(DraggableEventType.START, evt, true));
 
-            //contains initial position at first touch
-            const cStartPosition = sStart
-                .hold(null);
-
             //contains initial offset at first touch
             const cStartOffset = sTouchStartActive
                 .map(evt => makeEvent(null, evt, false))
+                .hold(null);
+
+            //contains initial position at first touch
+            const cStartPosition = sStart
                 .hold(null);
 
             //gate to check if dragging
@@ -84,6 +86,7 @@ export class Draggable {
             //events are filtered by validation
             const sMove = sTouchMove
                 .gate(cDragging)
+                .gate(options.cEnabled)
                 .map(evt => makeEvent(DraggableEventType.MOVE, evt, true))
                 .snapshot(cStartOffset, (moveEvent, offsetEvent) => ChangeEventPoint(moveEvent, getOffset(moveEvent.point, offsetEvent.point)))
                 .filter(evt => options.validator(evt));
@@ -92,6 +95,7 @@ export class Draggable {
             //gestures are detected and added here
             const sEnd = sTouchEnd
                 .gate(cDragging)
+                .gate(options.cEnabled)
                 .map(evt => makeEvent(DraggableEventType.END, evt, true))
                 .snapshot(cStartPosition, (endEvent, initEvent) => ChangeEventGesture(endEvent, getGesture(initEvent, endEvent)));
 
@@ -190,8 +194,12 @@ export class Draggable {
                 return (normalizeOptions({}));
             }
 
-            if (options.forceInteractive === undefined) {
-                options.forceInteractive = true;
+            if(options.cEnabled === undefined) {
+                options.cEnabled = new Cell<boolean>(true);
+            }
+
+            if (options.makeInteractive === undefined) {
+                options.makeInteractive = true;
             }
 
             if (options.validator === undefined) {

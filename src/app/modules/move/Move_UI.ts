@@ -13,7 +13,6 @@ export class Shape extends PIXI.Graphics {
 
     constructor(public readonly opts: ShapeOptions) {
         super();
-        this.interactive = this.buttonMode = true;
         this.redraw();
         this.x = opts.initX;
         this.y = opts.initY;
