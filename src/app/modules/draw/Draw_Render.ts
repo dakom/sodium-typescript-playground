@@ -1,40 +1,34 @@
 
 import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink } from "sodiumjs";
-import { CanvasWidth, CanvasHeight, Main } from "../../main/Main";
 import { Brush } from "./Draw_Brush";
 import { Point } from "./Draw";
+import { Main } from "../../main/Main";
 import * as R from "ramda";
 
-export class Canvas extends PIXI.Sprite {
+export class CanvasRender extends PIXI.Sprite {
     private renderTexture: PIXI.RenderTexture;
     private drawBuffer: PIXI.Sprite;
-    private startPoint: Point;
     
-    constructor(private brush: Brush) {
+    constructor(private brush: Brush, bounds:PIXI.Rectangle) {
         //rendering/vis setup
-        super(PIXI.RenderTexture.create(CanvasWidth, CanvasHeight));
+        super(PIXI.RenderTexture.create(bounds.width, bounds.height));
         this.interactive = true;
         this.renderTexture = this.texture as PIXI.RenderTexture;
         this.drawBuffer = new PIXI.Sprite();
     }
 
     public drawBegin(point:Point) {
-        this.startPoint = point;
         this.brush.changeColor();
-    }
-
-    public drawUpdate(point:Point) {
-        this.drawLine(this.startPoint, point);
-        this.startPoint = point;
     }
 
     public drawEnd(point:Point) {
 
     }
 
-    drawLine(p1:Point, p2:Point) {
+    public drawUpdate(p1:PIXI.Point, p2:PIXI.Point) {
         const points = this.getLine(p1.x, p1.y, p2.x, p2.y);
         if (points.length == 0) {
+            console.error("THIS SHOULD NEVER HAPPEN");
             return;
         }
 
@@ -49,6 +43,7 @@ export class Canvas extends PIXI.Sprite {
         Main.app.renderer.render(this.drawBuffer, this.renderTexture, false);
         this.brush.returnToPool(sprites);
         this.drawBuffer.removeChildren();
+     
     }
 
     //algorithm adapted from http://cboard.cprogramming.com/game-programming/67832-line-drawing-algorithm.html#post485086

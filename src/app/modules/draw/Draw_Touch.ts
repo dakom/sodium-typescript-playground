@@ -1,79 +1,103 @@
 
 import { Cell, Transaction, CellLoop, CellSink, Stream, StreamSink, Tuple2 } from "sodiumjs";
 import { Point } from "./Draw";
+import { Main } from "../../main/Main";
 
-export enum TouchType {
-    WAIT,
-    START,
-    MOVE,
-    END
+export interface Move {
+    p1: PIXI.Point;
+    p2: PIXI.Point;
 }
 
-export interface TouchInfo {
-    type: TouchType;
-    point: Point;
-}
+export class CanvasTouch {
+    public readonly sStart: Stream<PIXI.Point>;
+    public readonly sMove: Stream<Move>;
+    public readonly sEnd: Stream<PIXI.Point>;
 
-export class TouchManager {
-    
-    private _sTouch:Stream<TouchInfo>;
+    private _dispose:() => void;
 
     constructor(private target: PIXI.Sprite) {
-        //basic touch setup... raw touches are internal only.
-        const sRawTouch = new StreamSink<TouchInfo>();
+        //stream sinks for dispatching local events (triggered via ui/pixi listeners)
+        const sTouchStart = new StreamSink<PIXI.interaction.InteractionEvent>();
+        const sTouchMove = new StreamSink<PIXI.interaction.InteractionEvent>();
+        const sTouchEnd = new StreamSink<PIXI.interaction.InteractionEvent>();
 
-        target.on('pointerdown', evt => updateRawTouch(TouchType.START, evt));
-        target.on('pointermove', evt => updateRawTouch(TouchType.MOVE, evt));
-        target.on('pointerup', evt => updateRawTouch(TouchType.END, evt));
-        target.on('pointerupoutside', evt => updateRawTouch(TouchType.END, evt));
-
-        function updateRawTouch(touchType: TouchType, evt: PIXI.interaction.InteractionEvent) {
-            //this is pure, but not as performant... to increase performance we could pass a point
-            //in casual tests though, it's a non-issue
-            const touchPoint = evt.data.getLocalPosition(evt.currentTarget, undefined, evt.data.global);
-            sRawTouch.send({
-                type: touchType,
-                point: {
-                    x: touchPoint.x >> 0,
-                    y: touchPoint.y >> 0
-                }
-            });
+        /* UI / PIXI listeners */
+        //using named listeners to facilitate removal
+        const dispatchStart = evt => sTouchStart.send(evt);
+        const dispatchMove = evt => sTouchMove.send(evt);
+        const dispatchEnd = evt => {
+            sTouchEnd.send(evt); 
+                sTouchStart.send(null); //send null to reset cDragging
         }
-
-        //validate rawTouch. The validation function gets the oldState via collect()
-        //in other words this is a sort of state machine implemented in frp
-        this._sTouch = sRawTouch.collect(TouchType.WAIT, (touchInfo, state) => {
-            //copy the object, for the sake of purity
-            const updatedInfo = {
-                    type: this.validate(state, touchInfo) ? touchInfo.type : TouchType.WAIT,
-                    point: {
-                        x: touchInfo.point.x,
-                        y: touchInfo.point.y
-                    }
-                }
-                return new Tuple2<TouchInfo, TouchType>(updatedInfo, updatedInfo.type);
-            })
-            .filter(t => t.type !== TouchType.WAIT);
-    }
-
-    public get sTouch(): Stream<TouchInfo> {
-        return this._sTouch;
-    }
-
-    validate(oldState: TouchType, touchInfo: TouchInfo): boolean {
-            //could add more validation here, like maybe geom coordinates
-            if (touchInfo.type === TouchType.START) {
-                if (oldState === TouchType.WAIT || oldState === TouchType.END) {
-                    return true;
-                }
-            } else if (touchInfo.type === TouchType.MOVE) {
-                if (oldState === TouchType.START || oldState === TouchType.MOVE) {
-                    return true;
-                }
+        target.on('pointerdown', dispatchStart);
+        
+        function toggleGlobalListeners(flag: boolean) {
+            if (flag) {
+                Main.app.renderer.plugins.interaction.on('pointermove', dispatchMove);
+                Main.app.renderer.plugins.interaction.on('pointerup', dispatchEnd);
+                Main.app.renderer.plugins.interaction.on('pointeroutside', dispatchEnd);
             } else {
-                return true;
+                Main.app.renderer.plugins.interaction.off('pointermove', dispatchMove);
+                Main.app.renderer.plugins.interaction.off('pointerup', dispatchEnd);
+                Main.app.renderer.plugins.interaction.off('pointeroutside', dispatchEnd);
             }
-
-            return false;
         }
+
+        /* Main FRP logic */
+        const cDragging = sTouchStart.map(evt => evt === null ? false : true).hold(false);
+
+        this.sStart = pointStream(sTouchStart, false);
+        this.sEnd = pointStream(sTouchEnd, true);
+
+        /* This is where the magic happens. It's like this:
+            1. Get any start events and map it to null
+            2. Merge that with any move events
+            3. Collect these updates into a state machine that will validate the move and/or update a continuous path
+            4. If the update is invalid (due to the event being a start or both points being identical), filter it out 
+        */
+        this.sMove = this.sStart
+                .map(evt => null)
+                .orElse(pointStream(sTouchMove, true))
+                .collect(null, (nextPoint, prevPoint: PIXI.Point) => new Tuple2(
+                    (prevPoint === null || nextPoint === null || prevPoint.equals(nextPoint)) 
+                        ? null 
+                        : {
+                            p1: prevPoint,
+                            p2: nextPoint
+                        }, 
+                        nextPoint))
+                    .filterNotNull();
+
+
+        //listeners
+        const unlisteners = new Array<() => void>();
+
+        unlisteners.push(
+            sTouchStart.filterNotNull().listen(() => toggleGlobalListeners(true)),
+            sTouchEnd.listen(() => toggleGlobalListeners(false)),
+        )
+
+        
+        
+        //helper function to create gated/validated streams
+        function pointStream(s: Stream<PIXI.interaction.InteractionEvent>, onlyIfDragging: boolean): Stream<PIXI.Point> {
+            return s.snapshot(cDragging, (evt, dragging) => 
+                (dragging || !onlyIfDragging) ? evt : null)
+                    .filterNotNull()
+                    .map(evt => evt.data.getLocalPosition(target, undefined, evt.data.global))
+                    .map(point => new PIXI.Point(point.x >> 0, point.y >> 0)) //we're only interested in the rounded numbers
+        }
+
+        this._dispose = () => {
+            unlisteners.forEach(unlistener => unlistener());
+            target.off('pointerdown', dispatchStart);
+            toggleGlobalListeners(false);
+            
+        }
+        
+    }
+
+    public dispose() {
+        this._dispose();
+    }
 }
