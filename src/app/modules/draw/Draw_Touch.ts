@@ -61,10 +61,10 @@ export class CanvasTouch {
                 .collect(null, (nextPoint, prevPoint: PIXI.Point) => new Tuple2(
                     (prevPoint === null || nextPoint === null || prevPoint.equals(nextPoint)) 
                         ? null 
-                        : {
+                        : Object.freeze({
                             p1: prevPoint,
                             p2: nextPoint
-                        }, 
+                        }), 
                         nextPoint))
                     .filterNotNull();
 
@@ -73,12 +73,10 @@ export class CanvasTouch {
         const unlisteners = new Array<() => void>();
 
         unlisteners.push(
-            sTouchStart.filterNotNull().listen(() => toggleGlobalListeners(true)),
-            sTouchEnd.listen(() => toggleGlobalListeners(false)),
+            this.sStart.listen(() => toggleGlobalListeners(true)),
+            this.sEnd.listen(() => toggleGlobalListeners(false)),
         )
 
-        
-        
         //helper function to create gated/validated streams
         function pointStream(s: Stream<PIXI.interaction.InteractionEvent>, onlyIfDragging: boolean): Stream<PIXI.Point> {
             return s.snapshot(cDragging, (evt, dragging) => 
@@ -88,6 +86,7 @@ export class CanvasTouch {
                     .map(point => new PIXI.Point(point.x >> 0, point.y >> 0)) //we're only interested in the rounded numbers
         }
 
+        /* Cleanup */
         this._dispose = () => {
             unlisteners.forEach(unlistener => unlistener());
             target.off('pointerdown', dispatchStart);
