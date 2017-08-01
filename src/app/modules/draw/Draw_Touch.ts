@@ -51,8 +51,11 @@ export class CanvasTouch {
 
         /* This is where the magic happens. It's like this:
             1. Get any start events and map it to null
-            2. Merge that with any move events
-            3. Collect these updates into a state machine that will validate the move and/or update a continuous path
+            2. Merge that with any move events (which are points)
+            3. Collect these updates into a state machine which uses a Point as state and outputs a Move (containing two points)
+            3a. If the updated move point (nextPoint) or state (prevPoint) are null, or if they are equal, the output is null
+            3b. Otherwise, the output is the Move with prevPoint and nextPoint.
+            3c. The next state (prevPoint of the next call) is always set to nextPoint of this call - this allows continous lines.
             4. If the update is invalid (due to the event being a start or both points being identical), filter it out 
         */
         this.sMove = this.sStart
@@ -82,7 +85,7 @@ export class CanvasTouch {
             return s.snapshot(cDragging, (evt, dragging) => 
                 (dragging || !onlyIfDragging) ? evt : null)
                     .filterNotNull()
-                    .map(evt => evt.data.getLocalPosition(target, undefined, evt.data.global))
+                    .map(evt => evt.data.getLocalPosition(target, undefined, evt.data.global)) //note - for performance increase in exchange for purity, a local cached point could be used instead of undefined in getLocalPosition()
                     .map(point => new PIXI.Point(point.x >> 0, point.y >> 0)) //we're only interested in the rounded numbers
         }
 
