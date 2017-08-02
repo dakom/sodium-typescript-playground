@@ -63,7 +63,9 @@ class TestViaGate extends Test {
 
 export class GateTest {
     constructor() {
-        new TestViaFilter();
-        new TestViaGate();
+        describe('Gate vs. Filter', () => {
+            new TestViaFilter();
+            new TestViaGate();
+        });
     }
 }

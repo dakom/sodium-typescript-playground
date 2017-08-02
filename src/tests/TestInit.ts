@@ -1,5 +1,7 @@
 
 import {SodiumTests} from "./sodium/SodiumTests";
+import {TempTest} from "./temp/TempTest";
+
 import { expect } from 'chai';
 
 class TesterInit {
@@ -11,6 +13,7 @@ class TesterInit {
             });
        });
 
+       new TempTest();
        new SodiumTests();
     }
 }
