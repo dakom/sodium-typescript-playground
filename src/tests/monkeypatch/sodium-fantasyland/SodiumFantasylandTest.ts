@@ -21,7 +21,6 @@ Cell.prototype[FL.ap] = function (val) {
 }
 Cell[FL.of] = v => new Cell(v);
 
-
 //Main
 
 let lib;
@@ -41,17 +40,26 @@ export class SodiumFantasylandTest {
                 new _ApplicativeTest();
             });
         });
-        
+
     }
 }
 
 class _ApplicativeTest {
     constructor() {
+        this.testLogic();
+        this.testSequence();
+
+    }
+
+    testLogic() {
+        //todo: https://github.com/fantasyland/fantasy-land/blob/master/laws/applicative.js
+    }
+    testSequence() {
         const aCells = new Array<Cell<number>>(new Cell<number>(1), new Cell<number>(2), new Cell<number>(3));
         const cArrays = lib.sequence(Cell[FL.of], aCells);
 
         cArrays.listen(nArr => {
-            it("array should have correct values", (done) => {
+            it("sequence() - array should have correct values", (done) => {
                 expect(nArr).to.deep.equal([1, 2, 3])
                 done();
             });
@@ -61,18 +69,18 @@ class _ApplicativeTest {
 
 class _ApplyTest {
     constructor() {
-        this.testEquivilency();
+        this.testLogic();
         this.testLift();
     }
 
-    testEquivilency() {
+    testLogic() {
         const compose = f => g => x => f(g(x));
         const y = new Cell<(t: any) => any>(t => t);
 
         const a = y[FL.ap](y[FL.ap](y[FL.map](compose)));
         const b = y[FL.ap](y)[FL.ap](y);
 
-        it("applicatives should equal composition", (done) => {
+        it("core logic", (done) => {
             expect(a.sample()).to.equal(b.sample());
             done();
         });
@@ -83,7 +91,7 @@ class _ApplyTest {
 
         const cResult = addA(new Cell<number>(2), new Cell<number>(3));
         cResult.listen(n => {
-            it("lift result in 5", (done) => {
+            it("lift results in 5", (done) => {
                 expect(n).to.equal(5);
                 done();
             });
