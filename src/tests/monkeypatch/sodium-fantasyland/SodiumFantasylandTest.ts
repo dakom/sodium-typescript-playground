@@ -5,20 +5,14 @@ import { expect } from 'chai';
 import { create, env } from 'sanctuary';
 import * as R from "ramda";
 import * as FL from "fantasy-land";
-import * as $ from 'sanctuary-def';
-import * as type from 'sanctuary-type-identifiers'
 
 declare const NODE_ENV: string;
 
+//required unless we also define Sanctuary types
 const S = create({
     checkTypes: false,
     env,
 });
-
-
-interface numberAp {
-    (a: number): number;
-}
 
 //monkey-patching
 Cell.prototype[FL.map] = Cell.prototype.map;
