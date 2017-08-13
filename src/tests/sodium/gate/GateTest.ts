@@ -13,16 +13,16 @@ class Test {
     protected sValidated:Stream<number>;
 
     constructor(private label:string) {
-        console.log("---" + label + "---");
+        //console.log("---" + label + "---");
         this.sUpdate = new StreamSink<number>();
     }
 
     public run(targetVal:number, testLabel:string) {
-        this.sUpdate.listen(n => console.log("updated value", n));
+        //this.sUpdate.listen(n => console.log("updated value", n));
 
         this.sValidated.listen(n => {
             it(this.label + " test " + testLabel, (done) => {
-                console.log("VALIDATED VALUE", n);
+               // console.log("VALIDATED VALUE", n);
                 expect(n).to.equal(targetVal);
                 done();
             });
@@ -31,7 +31,7 @@ class Test {
         this.sUpdate.send(0);
         this.sUpdate.send(5);
         this.sUpdate.send(11);
-        console.log("");
+        //console.log("");
     }
 }
 

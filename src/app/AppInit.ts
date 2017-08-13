@@ -10,9 +10,6 @@ import { CellLoop, StreamSink, Cell, Transaction, Operational } from "sodiumjs"
 import { SelfDisposingContainer } from "../lib/display/SelfDisposingContainer";
 import { FPS } from "./fps/FPS";
 
-//setup temp monkeypatching
-import {SodiumFantasyland} from "../monkeypatch/SodiumFantasyLand-MonkeyPatch";
-SodiumFantasyland();
 
 //Canvas/HTML setup
 Main.Init();

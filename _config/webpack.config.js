@@ -38,12 +38,14 @@ module.exports = {
 
     plugins: [
         new webpack.DefinePlugin({
-            DIST_SERVER: JSON.stringify(CommonConfig.GetInfo("dist",  process.env.NODE_ENV))
+            DIST_SERVER: JSON.stringify(CommonConfig.GetInfo("dist",  process.env.NODE_ENV)),
+            NODE_ENV: JSON.stringify(process.env.NODE_ENV)
         }),
 
         new HtmlWebpackPlugin({
             JS_LIB_INCLUDES: CommonConfig.GetInfo("html-template", process.env.NODE_ENV),
             DIST_SERVER: CommonConfig.GetInfo("dist", process.env.NODE_ENV),
+            NODE_ENV: process.env.NODE_ENV,
             hash: true,
             template: CommonConfig.GetWebpackHtmlTemplate(process.env.NODE_ENV),
             chunks: ['bundle']

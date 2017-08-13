@@ -52,6 +52,8 @@
     "ramda": "0.24.1",
     "rimraf": "2.6.1",
     "sanctuary": "^0.13.2",
+    "sanctuary-def": "^0.13.0",
+    "sanctuary-type-identifiers": "^2.0.1",
     "sodiumjs": "git+https://github.com/SodiumFRP/sodium-typescript.git",
     "source-map-loader": "^0.2.1",
     "ts-loader": "^2.3.2",

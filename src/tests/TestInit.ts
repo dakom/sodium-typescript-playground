@@ -4,9 +4,6 @@ import {TempTest} from "./temp/TempTest";
 import {MonkeyPatchTest} from "./monkeypatch/MonkeyPatchTest"
 import { expect } from 'chai';
 
-//setup temp monkeypatching
-import {SodiumFantasyland} from "../monkeypatch/SodiumFantasyLand-MonkeyPatch";
-SodiumFantasyland();
 
 class TesterInit {
     
