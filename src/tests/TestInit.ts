@@ -1,7 +1,8 @@
 
 import {SodiumTests} from "./sodium/SodiumTests";
 import {TempTest} from "./temp/TempTest";
-import {MonkeyPatchTest} from "./monkeypatch/MonkeyPatchTest"
+import {FunctionalLibrariesTest} from "./functional-libraries/FunctionalLibrariesTest";
+import {FantasyLandTest} from "./fantasyland/FantasyLandTest";
 import { expect } from 'chai';
 
 
@@ -15,7 +16,8 @@ class TesterInit {
        });
 
        new TempTest();
-       new MonkeyPatchTest();
+       new FantasyLandTest();
+       new FunctionalLibrariesTest();
        new SodiumTests();
     }
 }
