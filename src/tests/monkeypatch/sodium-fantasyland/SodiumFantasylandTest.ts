@@ -48,6 +48,7 @@ class _ApplicativeTest {
     constructor() {
         this.testLogic();
         this.testSequence();
+        this.testSequenceDeeper();
 
     }
 
@@ -64,6 +65,54 @@ class _ApplicativeTest {
                 done();
             });
         });
+    }
+
+    testSequenceDeeper() {
+        const aStreams = [
+            new StreamSink<string>(),
+            new StreamSink<string>(),
+            new StreamSink<string>()
+        ]
+
+        const aCells:Array<Cell<string>> = aStreams.map(stream => stream.hold(""));
+
+        const cArrays:Cell<Array<string>> = lib.sequence(Cell[FL.of], aCells);
+
+        let idx = 0;
+        
+
+        cArrays.listen(nArr => {
+            const res = nArr
+                .filter(val => val.length)
+                .join(" ");
+                
+            let target:string;
+
+            switch(idx++) {
+                    case 0: target = ""; break;
+                    case 1: target = "Hello"; break;
+                    case 2: target = "Hello World"; break;
+                    case 3: target = "Do World"; break;
+                    case 4: target = "Do"; break;
+                    case 5: target = "Do Good"; break;
+                    case 6: target = "Do Good !"; break;
+            }
+
+            it("sequence() - array should have correct values", (done) => {
+                expect(res).to.equal(target);
+                done();
+            });
+
+            
+        });
+
+        
+        aStreams[0].send("Hello");
+        aStreams[1].send("World");
+        aStreams[0].send("Do");
+        aStreams[1].send("");
+        aStreams[1].send("Good");
+        aStreams[2].send("!");
     }
 }
 
