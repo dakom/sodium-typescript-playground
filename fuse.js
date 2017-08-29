@@ -10,7 +10,7 @@ const { FuseBox, QuantumPlugin} = require("fuse-box");
 const fuse = FuseBox.init({
     homeDir: "src",
     output: `dist/${outputName}`,
-    sourceMaps: !IsProduction && { inline: false },
+    sourceMaps: !IsProduction, // && { inline: false },
     plugins : [
         IsProduction && 
         QuantumPlugin({
