@@ -1,6 +1,8 @@
 ### in case we want to use temp files to not check in or large files etc.
 GIT-IGNORE
 
+.fusebox
+
 # production
 build
 dist
