@@ -9,8 +9,7 @@
     "live": "cross-env BUNDLE_TYPE=live node fuse.js",
     "build": "npm run clean && npm run _build:dev && npm run _build:prod",
     "_build:dev": "cross-env BUNDLE_TYPE=dev node fuse.js",
-    "_build:prod": "cross-env BUNDLE_TYPE=production node fuse.js",
-    "_localstatic": "http-server ./static -p 4000 --cors"
+    "_build:prod": "cross-env BUNDLE_TYPE=production node fuse.js"
   },
   "author": "David Komer",
   "license": "MIT",
@@ -21,7 +20,6 @@
     "cross-env": "^5.0.5",
     "fuse-box": "^2.2.2",
     "fuse-test-runner": "^1.0.13",
-    "http-server": "^0.10.0",
     "install": "^0.10.1",
     "npm-run-all": "^4.0.2",
     "ramda": "0.24.1",
