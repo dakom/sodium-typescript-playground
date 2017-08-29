@@ -10,6 +10,8 @@ import { CellLoop, StreamSink, Cell, Transaction, Operational } from "sodiumjs"
 import { SelfDisposingContainer } from "../lib/display/SelfDisposingContainer";
 import { FPS } from "./fps/FPS";
 
+console.log("Starting... 001");
+
 //Canvas/HTML setup
 Main.Init();
 

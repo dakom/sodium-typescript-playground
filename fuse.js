@@ -1,7 +1,9 @@
-const projectName = "playground";
+const path = require('path');
+const express = require('express');
 
-const IsProduction = (process.env.NODE_ENV === "production");
-const IsTest = (process.env.NODE_ENV === "test");
+const bundleType = process.env.BUNDLE_TYPE;
+const projectName = "playground";
+const IsProduction = (bundleType === "production");
 const outputName = IsProduction ? "$name.min.js" : "$name.js";
 
 const { FuseBox, QuantumPlugin} = require("fuse-box");
@@ -17,17 +19,45 @@ const fuse = FuseBox.init({
             uglify: true,
             target: "universal"
         })
-    ]
+    ],
+    shim: {
+        ramda: {
+            exports: "R",
+        },
+   }
 });
 
 const bundle = fuse.bundle(projectName);
 
-if(IsTest) {
-    console.log("-----------RUNNING TESTS--------");
-    bundle.test("tests/TestInit.ts");
-} else {
-    bundle.instructions(`app/AppInit.ts`);
-}
-    
+console.log("-----------" + bundleType + " --------");
 
+if(bundleType === "test") {
+    bundle.test("tests/TestInit.test.ts");
+} else {
+    bundle.instructions(`>app/AppInit.ts`);
+}
+
+if(bundleType === "live") {
+    fuse.dev({ root: false, open: true }, server => {
+        const static = path.resolve("./static");
+        const dist = path.resolve("./dist");
+        const app = server.httpServer.app;
+        app.get("/playground.js", function(req, res) {
+            res.sendFile(path.join(dist, "playground.js"));
+        });
+        app.get("/playground.map.js", function(req, res) {
+            res.sendFile(path.join(dist, "playground.map.js"));
+        });
+        app.get("/", function(req, res) {
+            res.sendFile(path.join(static, "index-dev.html"));
+        });
+
+        app.use(express.static(static));
+    });
+
+    bundle.watch();
+}
+
+
+    
 fuse.run();
