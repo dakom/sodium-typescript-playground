@@ -49,11 +49,11 @@ export class Path {
     
 
     public static GetImagePath(path: string): string {
-        return "/static/images/" + path;
+        return "static/images/" + path;
     }
 
     public static GetAudioPath(path: string): string {
-        return "/static/audio/" + path;
+        return "static/audio/" + path;
     }
 
 

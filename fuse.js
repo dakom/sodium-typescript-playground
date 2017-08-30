@@ -50,6 +50,7 @@ function getPlugins() {
         WebIndexPlugin({
             title: devPageTitle,
             template: "src/html-templates/index.html",
+            path: "."
         })
     ];
 
