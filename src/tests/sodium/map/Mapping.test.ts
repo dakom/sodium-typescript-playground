@@ -3,16 +3,13 @@ import { Cell, Stream, StreamSink, Transaction } from "sodiumjs";
 import { expect } from 'chai';
 
 export class MappingTest {
-    constructor() {
-        describe('Mapping', () => {
-            new _MappingTest();
-        });
-
+    'Mapping' () {
+        new _MappingTest();
     }
 }
 
 class _MappingTest {
-    constructor() {
+    'check order'(done) {
         let idx = 0;
         const expectedOrder = [
             true,
@@ -36,10 +33,8 @@ class _MappingTest {
         cEnabled.listen(flag => {
             const expectedFlag = expectedOrder[idx++];
 
-            it((expectedFlag ? "true" : "false"), (done) => {
-                expect(flag).to.equal(expectedFlag);
+            expect(flag).to.equal(expectedFlag);
                 done();
-            });
         });
 
 

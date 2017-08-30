@@ -19,6 +19,7 @@ const sourceMapStyle = { inline: false };
 
 console.log("-----------" + process.env.BUNDLE_TYPE + " --------");
 
+
 const fuse = FuseBox.init({
     homeDir: "src",
     output: getOutputName(),
@@ -38,31 +39,33 @@ runFuse();
  */
 
 function getOutputName() {
-    return (process.env.BUNDLE_TYPE !== "production") ? `dist/${projectName}.js` : `dist/${projectName}.min.js`;
+    return (process.env.BUNDLE_TYPE !== "production") ? `dist/$name.js` : `dist/$name.min.js`;
 }
 function getSourceMaps() {
     return (process.env.BUNDLE_TYPE === "production") ? undefined : sourceMapStyle;
 }
 
 function getPlugins() {
+    const plugins = [
+        WebIndexPlugin({
+            title: devPageTitle,
+            template: "src/html-templates/index.html",
+        })
+    ];
+
     switch (process.env.BUNDLE_TYPE) {
         case "production":
-            return [
+            plugins.push(
                 QuantumPlugin({
                     bakeApiIntoBundle: projectName,
                     treeshake: true,
                     uglify: true,
                     target: "universal"
                 })
-            ];
-        case "live":
-            return [
-                WebIndexPlugin({
-                    title: devPageTitle,
-                    template: "src/html-templates/index.html"
-                })
-            ]
+            );
     }
+
+    return plugins;
 }
 
 function getShim() {
