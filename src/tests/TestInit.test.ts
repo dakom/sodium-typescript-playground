@@ -6,7 +6,9 @@ import { expect } from 'chai';
 
 export class TesterInit {
     'init'() {
-        expect(1+1).to.equal(2);
+        
+        expect(1+1).to.equal(3);
+        
     }
 }
 
