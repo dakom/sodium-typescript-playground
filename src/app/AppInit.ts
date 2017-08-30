@@ -10,6 +10,8 @@ import { CellLoop, StreamSink, Cell, Transaction, Operational } from "sodiumjs"
 import { SelfDisposingContainer } from "../lib/display/SelfDisposingContainer";
 import { FPS } from "./fps/FPS";
 
+console.log("Starting [Version 002]");
+
 //Canvas/HTML setup
 Main.Init();
 
@@ -52,6 +54,7 @@ Operational.updates(cScene).snapshot(cScene, (newScene, oldScene) => {
     //these should always be the top layer
     stage.setChildIndex(topMenu, stage.children.length - 1);
     stage.setChildIndex(fps, stage.children.length - 1);
+    
 });
 
 //force starting module (via menu)

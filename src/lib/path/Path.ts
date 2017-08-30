@@ -1,5 +1,3 @@
-declare const DIST_SERVER: string;
-
 export class Path {
 
     static _audioExt: string;
@@ -51,11 +49,11 @@ export class Path {
     
 
     public static GetImagePath(path: string): string {
-        return DIST_SERVER + ("images/" + path);
+        return "/static/images/" + path;
     }
 
     public static GetAudioPath(path: string): string {
-        return DIST_SERVER + ("audio/" + path);
+        return "/static/audio/" + path;
     }
 
 
