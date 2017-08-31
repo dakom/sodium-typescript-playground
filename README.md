@@ -91,4 +91,4 @@ The cool thing here is, again, when it comes down to it, the core logic is tight
 
 # Misc
 
-The boilerplate webpack, typescript, etc. code is cloned from [here](https://github.com/dakom/html5-boilerplate/tree/barebones)
+Packaging/bundler powered by [FuseBox](http://fuse-box.org/)
