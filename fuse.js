@@ -87,7 +87,8 @@ function setInstructions() {
     if (process.env.BUNDLE_TYPE !== "test") {
         bundle.instructions(`>app/AppInit.ts`);
     } else {
-        bundle.test("tests/TestInit.test.ts");
+        //bundle.test("[tests/**/**.test.ts]");
+        bundle.test();
     }
 }
 

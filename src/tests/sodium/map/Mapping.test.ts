@@ -3,22 +3,10 @@ import { Cell, Stream, StreamSink, Transaction } from "sodiumjs";
 import { expect } from 'chai';
 
 export class MappingTest {
-    'Mapping' () {
-        new _MappingTest();
-    }
-
-    'check order'(done) {
+    'Mapping'(done) {
         checkOrder(done);
     }
-    
 }
-
-class _MappingTest {
-    'check order'(done) {
-        checkOrder(done);        
-    }
-}
-
 
 function checkOrder(done) {
     let idx = 0;
