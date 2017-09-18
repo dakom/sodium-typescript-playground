@@ -10,6 +10,7 @@ const { FuseBox, QuantumPlugin} = require("fuse-box");
 const fuse = FuseBox.init({
     homeDir: "src",
     output: `dist/${outputName}`,
+    target: "browser",
     sourceMaps: !IsProduction, // && { inline: false },
     plugins : [
         IsProduction && 
@@ -17,7 +18,7 @@ const fuse = FuseBox.init({
             bakeApiIntoBundle : projectName,
             treeshake: true,
             uglify: true,
-            target: "universal"
+            target: "browser"
         })
     ],
     shim: {

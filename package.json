@@ -22,9 +22,9 @@
     "fuse-test-runner": "^1.0.13",
     "install": "^0.10.1",
     "npm-run-all": "^4.0.2",
+    "sodiumjs": "git+https://github.com/SodiumFRP/sodium-typescript.git#dakom/fusebox",
     "ramda": "0.24.1",
     "rimraf": "2.6.1",
-    "sodiumjs": "git+https://github.com/SodiumFRP/sodium-typescript.git",
     "typescript": "^2.4.2",
     "typescript-collections": "1.2.3",
     "uglify-js": "^3.0.28"
