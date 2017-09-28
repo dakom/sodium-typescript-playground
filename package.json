@@ -17,20 +17,20 @@
   "license": "MIT",
   "devDependencies": {
     "@types/chai": "^4.0.4",
-    "@types/pixi.js": "4.5.3",
-    "chai": "^4.1.1",
+    "@types/pixi.js": "4.5.4",
+    "chai": "^4.1.2",
     "cross-env": "^5.0.5",
-    "fuse-box": "^2.2.3-beta.17",
-    "fuse-test-runner": "^1.0.13",
+    "fuse-box": "^2.2.31",
+    "fuse-test-runner": "^1.0.14",
     "http-server": "^0.10.0",
     "install": "^0.10.1",
     "npm-run-all": "^4.1.1",
     "ramda": "0.24.1",
-    "rimraf": "2.6.1",
+    "rimraf": "2.6.2",
     "sodiumjs": "git+https://github.com/SodiumFRP/sodium-typescript.git",
-    "typescript": "^2.4.2",
-    "typescript-collections": "1.2.3",
-    "uglify-js": "^3.0.28"
+    "typescript": "^2.5.3",
+    "typescript-collections": "1.2.5",
+    "uglify-js": "^3.1.2"
   },
   "dependencies": {}
 }
